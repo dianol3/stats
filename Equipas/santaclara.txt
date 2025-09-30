@@ -1,0 +1,7 @@
+1;Luís
+4;Gui
+5;Zé
+6; joao
+7; manel
+3; Francisco
+8; joao francisco
