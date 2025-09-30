@@ -47,8 +47,6 @@ team_names_map = {
     "santaclara.txt": "Santa Clara"
 }
 
-import os
-
 # Pasta Equipas relativa ao ficheiro stats.py
 equipas_path = os.path.join(os.path.dirname(__file__), "Equipas")
 
@@ -287,4 +285,5 @@ if st.session_state.page == 3:
         return [cor]*len(row)
 
     st.dataframe(st.session_state.players.style.apply(style_player, axis=1), use_container_width=True)
+
 
