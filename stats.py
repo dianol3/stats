@@ -47,11 +47,17 @@ team_names_map = {
     "santaclara.txt": "Santa Clara"
 }
 
-# ======================
-# Funções
-# ======================
+import os
+
+# Pasta Equipas relativa ao ficheiro stats.py
+equipas_path = os.path.join(os.path.dirname(__file__), "Equipas")
+
+# Listar ficheiros
+team_files = [f for f in os.listdir(equipas_path) if f.endswith('.txt')]
+
+# Carregar jogadores
 def load_players(team_file):
-    filepath = os.path.join('C:/Users/Diana/Desktop/Stats/Equipas', team_file)
+    filepath = os.path.join(equipas_path, team_file)
     players_list = []
     with open(filepath, 'r', encoding='utf-8') as f:
         for line in f:
@@ -69,6 +75,10 @@ def load_players(team_file):
                 })
     st.session_state.players = pd.DataFrame(players_list)
 
+
+# ======================
+# Funções
+# ======================
 def add_stat(idx, stat, value=1):
     st.session_state.players.at[idx, stat] += value
     if stat == 'Golos':
@@ -277,3 +287,4 @@ if st.session_state.page == 3:
         return [cor]*len(row)
 
     st.dataframe(st.session_state.players.style.apply(style_player, axis=1), use_container_width=True)
+
