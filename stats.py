@@ -296,7 +296,7 @@ if st.session_state.page == 3:
     # Bloco de Notas - Log do Jogo
     # ======================
     st.subheader("📝 Bloco de Notas do Jogo")
-    if st.session_state.event_log:
+    if 'event_log' in st.session_state and st.session_state.event_log:
         for e in st.session_state.event_log:
             st.markdown(f"- {e}")
     else:
@@ -310,6 +310,7 @@ if st.session_state.page == 3:
         file_name="bloco_de_notas_jogo.txt",
         mime="text/plain"
     )
+
 
 
 
