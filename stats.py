@@ -77,6 +77,22 @@ def load_players(team_file):
 # ======================
 # Funções
 # ======================
+
+def remove_last_event(evento, jogador=None):
+    """
+    Remove a última ocorrência de um evento do log.
+    Se 'jogador' for fornecido, só remove eventos daquele jogador.
+    """
+    for i in reversed(range(len(st.session_state.event_log))):
+        if jogador:
+            if evento in st.session_state.event_log[i] and jogador in st.session_state.event_log[i]:
+                st.session_state.event_log.pop(i)
+                break
+        else:  # para eventos gerais, tipo Golo Adversário
+            if evento in st.session_state.event_log[i]:
+                st.session_state.event_log.pop(i)
+                break
+
 def log_event(descricao, value=1):
     minutos = int(st.session_state.elapsed_time // 60)
     segundos = int(st.session_state.elapsed_time % 60)
@@ -224,13 +240,14 @@ else:
             st.session_state.score['Adversário'] -= 1
             if st.session_state.score['Adversário'] < 0:
                 st.session_state.score['Adversário'] = 0
-            log_event("Golo Adversário", value=-1)  # remove último log correspondente
-
+            remove_last_event("Golo Adversário")
+    
     with col_adv2:
         if st.button("+1 Golo adv", key="golo_adversario_plus"):
             st.session_state.score['Adversário'] += 1
-            log_event("Golo Adversário", value=1)   # adiciona evento
-  
+            log_event("Golo Adversário")
+    
+      
 
     # Botões de controle
     col1, col2, col3, col4 = st.columns(4)
@@ -285,12 +302,14 @@ else:
             col_ev = st.sidebar.columns([2,1,1])
             col_ev[0].markdown(ev)
             if st.session_state.game_started:
-                if col_ev[1].button("-1", key=f"minus_{ev}"):
-                    add_stat(idx, ev, -1)
-                    log_event(f"{ev} - {selected_player} (-1)")  # regista evento
-                if col_ev[2].button("+1", key=f"plus_{ev}"):
+                if col_ev[2].button("+1", key=f"plus_{ev}"):  # incrementar
                     add_stat(idx, ev, 1)
-                    log_event(f"{ev} - {selected_player} (+1)")  # regista evento
+                    log_event(f"{ev} - {selected_player}")
+                
+                if col_ev[1].button("-1", key=f"minus_{ev}"):  # decrementar
+                    add_stat(idx, ev, -1)
+                    remove_last_event(ev, selected_player)  # remove do log
+
             else:
                 col_ev[1].button("-1", key=f"minus_{ev}_disabled", disabled=True)
                 col_ev[2].button("+1", key=f"plus_{ev}_disabled", disabled=True)
@@ -342,6 +361,7 @@ else:
         file_name="bloco_de_notas_jogo.txt",
         mime="text/plain"
     )
+
 
 
 
