@@ -77,23 +77,49 @@ def load_players(team_file):
 # ======================
 # Funções
 # ======================
-def log_event(descricao):  # NOVO
+def log_event(descricao, value=1):
     minutos = int(st.session_state.elapsed_time // 60)
     segundos = int(st.session_state.elapsed_time % 60)
     parte = "1ª Parte" if st.session_state.part == 1 else "2ª Parte"
+    
+    # Se for decremento, remover último log correspondente
+    if value < 0:
+        for i in reversed(range(len(st.session_state.event_log))):
+            if descricao in st.session_state.event_log[i]:
+                st.session_state.event_log.pop(i)
+                return  # remove apenas o último evento correspondente
+    
+    # Caso contrário, adicionar normalmente
     st.session_state.event_log.append(f"{parte} {minutos:02d}:{segundos:02d} - {descricao}")
-
 
 def add_stat(idx, stat, value=1):
     st.session_state.players.at[idx, stat] += value
+    
+    player_name = st.session_state.players.at[idx, 'Jogador']
+
     if stat == 'Golos':
         st.session_state.score['Nossa'] += value
         if st.session_state.score['Nossa'] < 0:
             st.session_state.score['Nossa'] = 0
-    if stat == 'Faltas Cometidas':
-        st.session_state.faltas_nossa += value
-    if stat == 'Faltas Sofridas':
-        st.session_state.faltas_adversario += value
+        log_event(f"Golo - {player_name}", value)
+
+    elif stat == 'Faltas Cometidas':
+        if st.session_state.playing_home:
+            st.session_state.faltas_nossa += value
+        else:
+            st.session_state.faltas_adversario += value
+        log_event(f"Falta Cometida - {player_name}", value)
+
+    elif stat == 'Faltas Sofridas':
+        if st.session_state.playing_home:
+            st.session_state.faltas_adversario += value
+        else:
+            st.session_state.faltas_nossa += value
+        log_event(f"Falta Sofrida - {player_name}", value)
+    
+    else:
+        # Para os outros stats
+        log_event(f"{stat} - {player_name}", value)
 
 def substitute_player(idx_out, idx_in):
     st.session_state.players.at[idx_out, 'Em jogo'] = False
@@ -194,16 +220,17 @@ else:
     # ======================
     col_adv1, col_adv2 = st.columns([1,1])
     with col_adv1:
-        if st.button("-1 Golo adv", key="golo_adversario_minus"):
-            st.session_state.score['Adversário'] -= 1
-            if st.session_state.score['Adversário'] < 0:
-                st.session_state.score['Adversário'] = 0
+    if st.button("-1 Golo adv", key="golo_adversario_minus"):
+        st.session_state.score['Adversário'] -= 1
+        if st.session_state.score['Adversário'] < 0:
+            st.session_state.score['Adversário'] = 0
+        log_event("Golo Adversário", value=-1)  # remove último log correspondente
+
     with col_adv2:
         if st.button("+1 Golo adv", key="golo_adversario_plus"):
             st.session_state.score['Adversário'] += 1
-            log_event("Golo Adversário")  # regista evento
-
-
+            log_event("Golo Adversário", value=1)   # adiciona evento
+  
 
     # Botões de controle
     col1, col2, col3, col4 = st.columns(4)
@@ -315,6 +342,7 @@ else:
         file_name="bloco_de_notas_jogo.txt",
         mime="text/plain"
     )
+
 
 
 
