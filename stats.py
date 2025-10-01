@@ -111,7 +111,8 @@ def update_time():
 if st.session_state.page == 1:
     st.title("⚽ Configuração do Jogo")
     modalidade = st.selectbox("Selecione a modalidade:", ["Futebol", "Futsal"])
-    team_files = [f for f in os.listdir('C:/Users/Diana/Desktop/Stats/Equipas') if f.endswith('.txt')]
+    equipas_path = "Equipas"
+    team_files = [f for f in os.listdir(equipas_path) if f.endswith('.txt')]
     team_name = st.selectbox("Selecione a equipa:", team_files)
     tempo_parte = st.number_input("Duração da parte (minutos):", min_value=1, value=45)
     clube_adversario = st.text_input("Nome do clube adversário")
@@ -283,6 +284,7 @@ if st.session_state.page == 3:
         return [cor]*len(row)
 
     st.dataframe(st.session_state.players.style.apply(style_player, axis=1), use_container_width=True)
+
 
 
 
