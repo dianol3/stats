@@ -220,11 +220,11 @@ else:
     # ======================
     col_adv1, col_adv2 = st.columns([1,1])
     with col_adv1:
-    if st.button("-1 Golo adv", key="golo_adversario_minus"):
-        st.session_state.score['Adversário'] -= 1
-        if st.session_state.score['Adversário'] < 0:
-            st.session_state.score['Adversário'] = 0
-        log_event("Golo Adversário", value=-1)  # remove último log correspondente
+        if st.button("-1 Golo adv", key="golo_adversario_minus"):
+            st.session_state.score['Adversário'] -= 1
+            if st.session_state.score['Adversário'] < 0:
+                st.session_state.score['Adversário'] = 0
+            log_event("Golo Adversário", value=-1)  # remove último log correspondente
 
     with col_adv2:
         if st.button("+1 Golo adv", key="golo_adversario_plus"):
@@ -342,6 +342,7 @@ else:
         file_name="bloco_de_notas_jogo.txt",
         mime="text/plain"
     )
+
 
 
 
