@@ -42,6 +42,9 @@ if 'page' not in st.session_state:
     st.session_state.page = 1  # Página 1 = configuração, 2 = titulares, 3 = jogo
 
 equipas_path = os.path.join(os.path.dirname(__file__), "Equipas")
+st.write("Equipas path:", equipas_path)
+st.write("Conteúdo da pasta:", os.listdir(os.path.dirname(__file__)))
+
 team_files = [f for f in os.listdir(equipas_path) if f.endswith('.txt')]
 
 
@@ -283,6 +286,7 @@ if st.session_state.page == 3:
         return [cor]*len(row)
 
     st.dataframe(st.session_state.players.style.apply(style_player, axis=1), use_container_width=True)
+
 
 
 
