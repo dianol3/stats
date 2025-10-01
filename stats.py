@@ -75,6 +75,13 @@ def load_players(team_file):
 # ======================
 # Funções
 # ======================
+def log_event(descricao):  # NOVO
+    minutos = int(st.session_state.elapsed_time // 60)
+    segundos = int(st.session_state.elapsed_time % 60)
+    parte = "1ª Parte" if st.session_state.part == 1 else "2ª Parte"
+    st.session_state.event_log.append(f"{parte} {minutos:02d}:{segundos:02d} - {descricao}")
+
+
 def add_stat(idx, stat, value=1):
     st.session_state.players.at[idx, stat] += value
     if stat == 'Golos':
@@ -246,7 +253,7 @@ if st.session_state.page == 3:
         idx = st.session_state.players[st.session_state.players['Jogador']==selected_player].index[0]
 
         st.sidebar.subheader("Eventos")
-        eventos = ['Golos','Assistências','Perdas de Bola','Recuperações','Amarelos','Vermelhos','Remates à Baliza','Remates Fora','Faltas Cometidas','Faltas Sofridas','Defesas']
+        eventos = ['Perdas de Bola','Recuperações','Remates à Baliza','Remates Fora','Defesas','Faltas Cometidas','Faltas Sofridas','Golos','Assistências','Amarelos','Vermelhos']
         for ev in eventos:
             col_ev = st.sidebar.columns([2,1,1])
             col_ev[0].markdown(ev)
@@ -284,6 +291,26 @@ if st.session_state.page == 3:
         return [cor]*len(row)
 
     st.dataframe(st.session_state.players.style.apply(style_player, axis=1), use_container_width=True)
+    
+ # ======================
+    # Bloco de Notas - Log do Jogo
+    # ======================
+    st.subheader("📝 Bloco de Notas do Jogo")
+    if st.session_state.event_log:
+        for e in st.session_state.event_log:
+            st.markdown(f"- {e}")
+    else:
+        st.write("Ainda não há eventos registados.")
+
+    # Botão para download do log
+    log_text = "\n".join(st.session_state.event_log)
+    st.download_button(
+        label="📥 Download Bloco de Notas",
+        data=log_text,
+        file_name="bloco_de_notas_jogo.txt",
+        mime="text/plain"
+    )
+
 
 
 
