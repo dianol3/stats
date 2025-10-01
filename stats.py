@@ -41,11 +41,9 @@ if 'faltas_adversario' not in st.session_state:
 if 'page' not in st.session_state:
     st.session_state.page = 1  # Página 1 = configuração, 2 = titulares, 3 = jogo
 
-# Pasta Equipas relativa ao ficheiro stats.py
 equipas_path = os.path.join(os.path.dirname(__file__), "Equipas")
-
-# Listar ficheiros
 team_files = [f for f in os.listdir(equipas_path) if f.endswith('.txt')]
+
 
 # Mapear ficheiros para nomes
 team_names_map = {
@@ -285,6 +283,7 @@ if st.session_state.page == 3:
         return [cor]*len(row)
 
     st.dataframe(st.session_state.players.style.apply(style_player, axis=1), use_container_width=True)
+
 
 
 
