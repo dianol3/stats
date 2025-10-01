@@ -205,6 +205,8 @@ if st.session_state.page == 3:
     with col_adv2:
         if st.button("+1 Golo adv", key="golo_adversario_plus"):
             st.session_state.score['Adversário'] += 1
+            log_event("Golo Adversário")  # regista evento
+
 
 
     # Botões de controle
@@ -262,11 +264,14 @@ if st.session_state.page == 3:
             if st.session_state.game_started:
                 if col_ev[1].button("-1", key=f"minus_{ev}"):
                     add_stat(idx, ev, -1)
+                    log_event(f"{ev} - {selected_player} (-1)")  # regista evento
                 if col_ev[2].button("+1", key=f"plus_{ev}"):
                     add_stat(idx, ev, 1)
+                    log_event(f"{ev} - {selected_player} (+1)")  # regista evento
             else:
                 col_ev[1].button("-1", key=f"minus_{ev}_disabled", disabled=True)
                 col_ev[2].button("+1", key=f"plus_{ev}_disabled", disabled=True)
+
 
     # ======================
     # Substituições
@@ -280,6 +285,8 @@ if st.session_state.page == 3:
             idx_out = st.session_state.players[st.session_state.players['Jogador']==out_player].index[0]
             idx_in = st.session_state.players[st.session_state.players['Jogador']==in_player].index[0]
             substitute_player(idx_out, idx_in)
+            log_event(f"Substituição - Entra {in_player}, Sai {out_player}")  # regista evento
+
 
     # ======================
     # Tabela de jogadores
@@ -312,6 +319,7 @@ if st.session_state.page == 3:
         file_name="bloco_de_notas_jogo.txt",
         mime="text/plain"
     )
+
 
 
 
