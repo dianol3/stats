@@ -91,15 +91,9 @@ def add_stat(idx, stat, value=1):
         if st.session_state.score['Nossa'] < 0:
             st.session_state.score['Nossa'] = 0
     if stat == 'Faltas Cometidas':
-        if st.session_state.playing_home:
-            st.session_state.faltas_nossa += value
-        else:
-            st.session_state.faltas_adversario += value
+        st.session_state.faltas_nossa += value
     if stat == 'Faltas Sofridas':
-        if st.session_state.playing_home:
-            st.session_state.faltas_adversario += value
-        else:
-            st.session_state.faltas_nossa += value
+        st.session_state.faltas_adversario += value
 
 def substitute_player(idx_out, idx_in):
     st.session_state.players.at[idx_out, 'Em jogo'] = False
@@ -166,8 +160,10 @@ if st.session_state.page == 2:
 # ======================
 # Página 3 - Jogo
 # ======================
-if st.session_state.page == 3:
+if st.session_state.playing_home:
     st.title(f"{team_names_map.get(st.session_state.team_name, st.session_state.team_name)} vs {st.session_state.clube_adversario}")
+else:
+    st.title(f"{st.session_state.clube_adversario} vs {team_names_map.get(st.session_state.team_name, st.session_state.team_name)}")
 
     # Cronómetro
     update_time()
@@ -319,6 +315,7 @@ if st.session_state.page == 3:
         file_name="bloco_de_notas_jogo.txt",
         mime="text/plain"
     )
+
 
 
 
