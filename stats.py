@@ -40,6 +40,8 @@ if 'faltas_adversario' not in st.session_state:
     st.session_state.faltas_adversario = 0
 if 'page' not in st.session_state:
     st.session_state.page = 1  # Página 1 = configuração, 2 = titulares, 3 = jogo
+if 'event_log' not in st.session_state:
+    st.session_state.event_log = []
 
 equipas_path = "Equipas"
 team_files = [f for f in os.listdir(equipas_path) if f.endswith('.txt')]
@@ -310,6 +312,7 @@ if st.session_state.page == 3:
         file_name="bloco_de_notas_jogo.txt",
         mime="text/plain"
     )
+
 
 
 
