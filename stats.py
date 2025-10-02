@@ -329,7 +329,13 @@ if not em_jogo.empty:
 # Substituições
 # ======================
 st.subheader("🔄 Substituições")
-banco = st.session_state.players[st.session_state.players['Em jogo']==False]
+if 'players' in st.session_state and not st.session_state.players.empty and 'Em jogo' in st.session_state.players.columns:
+    em_jogo = st.session_state.players[st.session_state.players['Em jogo'] == True]
+    banco = st.session_state.players[st.session_state.players['Em jogo'] == False]
+else:
+    em_jogo = pd.DataFrame()
+    banco = pd.DataFrame()
+
 if not em_jogo.empty and not banco.empty:
     out_player = st.selectbox("Jogador a sair (Em jogo):", em_jogo['Jogador'], key='out_player')
     in_player = st.selectbox("Jogador a entrar (Banco):", banco['Jogador'], key='in_player')
@@ -371,4 +377,5 @@ st.download_button(
     file_name="bloco_de_notas_jogo.txt",
     mime="text/plain"
 )
+
 
