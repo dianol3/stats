@@ -82,16 +82,23 @@ def remove_last_event(evento, jogador=None):
     """
     Remove a última ocorrência de um evento do log.
     Se 'jogador' for fornecido, só remove eventos daquele jogador.
+    Função segura: não gera erro se o log estiver vazio.
     """
+    if 'event_log' not in st.session_state or not st.session_state.event_log:
+        return  # nada para remover
+
+    # percorre o log de trás para frente
     for i in reversed(range(len(st.session_state.event_log))):
+        entry = st.session_state.event_log[i]
         if jogador:
-            if evento in st.session_state.event_log[i] and jogador in st.session_state.event_log[i]:
+            if evento in entry and jogador in entry:
                 st.session_state.event_log.pop(i)
                 break
-        else:  # para eventos gerais, tipo Golo Adversário
-            if evento in st.session_state.event_log[i]:
+        else:
+            if evento in entry:
                 st.session_state.event_log.pop(i)
                 break
+
 
 def log_event(descricao, value=1):
     minutos = int(st.session_state.elapsed_time // 60)
@@ -361,3 +368,4 @@ st.download_button(
     file_name="bloco_de_notas_jogo.txt",
     mime="text/plain"
 )
+
