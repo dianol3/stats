@@ -296,11 +296,11 @@ if st.session_state.page == 3:
             st.session_state.faltas_nossa = 0
             st.session_state.faltas_adversario = 0
             st.session_state.players['Tempo de Jogo'] = 0
-    from streamlit_autorefresh import st_autorefresh
+    from streamlit import st_autorefresh
 
-    # Auto refresh a cada 1 segundo
-    count = st_autorefresh(interval=1000, key="refresh")
-    
+    # Atualiza automaticamente a cada 1 segundo (1000 ms)
+    st_autorefresh(interval=1000, key="refresh")
+
     with col4:
         st.write("🔄 Atualização automática ligada (1s)")
 
@@ -394,5 +394,6 @@ if st.session_state.page == 3:
         file_name="bloco_de_notas_jogo.txt",
         mime="text/plain"
     )
+
 
 
