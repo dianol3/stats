@@ -279,7 +279,7 @@ if st.session_state.page == 3:
             log_event("Golo Adversário")
 
     # Botões de controle
-    col1, col2, col3 = st.columns(3)
+    col1, col2 = st.columns(2)
     with col1:
         if st.button("▶️ Iniciar / Retomar"):
             st.session_state.game_started = True
@@ -288,16 +288,6 @@ if st.session_state.page == 3:
     with col2:
         if st.button("⏸️ Pausar"):
             st.session_state.game_started = False
-    with col3:
-        if st.button("⏹️ Resetar"):
-            st.session_state.game_started = False
-            st.session_state.start_time = None
-            st.session_state.elapsed_time = 0
-            st.session_state.score = {"Nossa":0, "Adversário":0}
-            st.session_state.faltas_nossa = 0
-            st.session_state.faltas_adversario = 0
-            st.session_state.players['Tempo de Jogo'] = 0
-
 
     # Atualiza automaticamente a cada 1 segundo (1000 ms)
     st_autorefresh(interval=1000, key="refresh")
@@ -393,6 +383,7 @@ if st.session_state.page == 3:
         file_name="bloco_de_notas_jogo.txt",
         mime="text/plain"
     )
+
 
 
 
