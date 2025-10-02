@@ -2,10 +2,7 @@ import streamlit as st
 import pandas as pd
 import time
 import os
-from streamlit_autorefresh import st_autorefresh
 
-# Atualiza a cada 1 segundo (1000 ms)
-st_autorefresh(interval=1000, key="atualizacao_automatica")
 
 st.set_page_config(page_title="Estatísticas Ao Vivo", layout="wide")
 
@@ -299,9 +296,14 @@ if st.session_state.page == 3:
             st.session_state.faltas_nossa = 0
             st.session_state.faltas_adversario = 0
             st.session_state.players['Tempo de Jogo'] = 0
+    from streamlit_autorefresh import st_autorefresh
+
+    # Auto refresh a cada 1 segundo
+    count = st_autorefresh(interval=1000, key="refresh")
+    
     with col4:
-        if st.button("🔄 Atualizar"):
-            pass  # força atualização da página
+        st.write("🔄 Atualização automática ligada (1s)")
+
 
     # Início 2ª parte / Final do jogo
     if st.session_state.elapsed_time >= st.session_state.tempo_parte*60 and st.session_state.part == 1:
@@ -392,4 +394,5 @@ if st.session_state.page == 3:
         file_name="bloco_de_notas_jogo.txt",
         mime="text/plain"
     )
+
 
