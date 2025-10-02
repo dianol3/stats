@@ -116,13 +116,44 @@ def log_event(descricao, value=1):
     st.session_state.event_log.append(f"{parte} {minutos:02d}:{segundos:02d} - {descricao}")
 
 def add_stat(idx, stat, value=1):
-    st.session_state.players.at[idx, stat] += value
     player_name = st.session_state.players.at[idx, 'Jogador']
 
     if value < 0:
-        remove_last_event(stat, player_name)
+        # Decrementa a estatística
+        st.session_state.players.at[idx, stat] = max(0, st.session_state.players.at[idx, stat] + value)
+
+        # Corrige placares/faltas
+        if stat == 'Golos':
+            st.session_state.score['Nossa'] = max(0, st.session_state.score['Nossa'] + value)
+            remove_last_event(f"Golo - {player_name}", player_name)
+
+        elif stat == 'Faltas Cometidas':
+            if st.session_state.playing_home:
+                st.session_state.faltas_nossa = max(0, st.session_state.faltas_nossa + value)
+            else:
+                st.session_state.faltas_adversario = max(0, st.session_state.faltas_adversario + value)
+            remove_last_event(f"Falta Cometida - {player_name}", player_name)
+
+        elif stat == 'Faltas Sofridas':
+            if st.session_state.playing_home:
+                st.session_state.faltas_adversario = max(0, st.session_state.faltas_adversario + value)
+            else:
+                st.session_state.faltas_nossa = max(0, st.session_state.faltas_nossa + value)
+            remove_last_event(f"Falta Sofrida - {player_name}", player_name)
+
+        elif stat in ['Amarelos', 'Vermelhos']:
+            # Corrige cor da linha automaticamente via style
+            st.session_state.players.at[idx, stat] = max(0, st.session_state.players.at[idx, stat])
+            remove_last_event(f"{stat} - {player_name}", player_name)
+
+        else:
+            # Outros stats
+            remove_last_event(f"{stat} - {player_name}", player_name)
+
         return
 
+    # Incremento
+    st.session_state.players.at[idx, stat] += value
     if stat == 'Golos':
         st.session_state.score['Nossa'] += value
         log_event(f"Golo - {player_name}")
@@ -377,4 +408,5 @@ if st.session_state.page == 3:
     
     
     
+
 
