@@ -2,6 +2,10 @@ import streamlit as st
 import pandas as pd
 import time
 import os
+from streamlit_autorefresh import st_autorefresh
+
+# Atualiza a cada 1 segundo (1000 ms)
+st_autorefresh(interval=1000, key="atualizacao_automatica")
 
 st.set_page_config(page_title="Estatísticas Ao Vivo", layout="wide")
 
@@ -331,14 +335,10 @@ if st.session_state.page == 3:
         for ev in eventos:
             col_ev = st.sidebar.columns([2,1,1])
             col_ev[0].markdown(ev)
-            if st.session_state.game_started:
-                if col_ev[2].button("+1", key=f"plus_{ev}"):
-                    add_stat(idx, ev, 1)
-                if col_ev[1].button("-1", key=f"minus_{ev}"):
-                    add_stat(idx, ev, -1)
-            else:
-                col_ev[1].button("-1", key=f"minus_{ev}_disabled", disabled=True)
-                col_ev[2].button("+1", key=f"plus_{ev}_disabled", disabled=True)
+            if col_ev[2].button("+1", key=f"plus_{ev}"):
+                add_stat(idx, ev, 1)
+            if col_ev[1].button("-1", key=f"minus_{ev}"):
+                add_stat(idx, ev, -1)
 
     # ======================
     # Substituições
@@ -392,3 +392,4 @@ if st.session_state.page == 3:
         file_name="bloco_de_notas_jogo.txt",
         mime="text/plain"
     )
+
