@@ -298,6 +298,7 @@ if st.session_state.page == 3:
             st.session_state.players['Tempo de Jogo'] = 0
     from streamlit_extras.st_autorefresh import st_autorefresh
 
+
     # Atualiza automaticamente a cada 1 segundo (1000 ms)
     st_autorefresh(interval=1000, key="refresh")
 
@@ -394,6 +395,7 @@ if st.session_state.page == 3:
         file_name="bloco_de_notas_jogo.txt",
         mime="text/plain"
     )
+
 
 
 
