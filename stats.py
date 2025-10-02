@@ -279,7 +279,7 @@ if st.session_state.page == 3:
             log_event("Golo Adversário")
 
     # Botões de controle
-    col1, col2, col3, col4 = st.columns(4)
+    col1, col2, col3 = st.columns(3)
     with col1:
         if st.button("▶️ Iniciar / Retomar"):
             st.session_state.game_started = True
@@ -302,8 +302,6 @@ if st.session_state.page == 3:
     # Atualiza automaticamente a cada 1 segundo (1000 ms)
     st_autorefresh(interval=1000, key="refresh")
 
-    with col4:
-        st.write("🔄 Atualização automática ligada (1s)")
 
 
     # Início 2ª parte / Final do jogo
@@ -395,6 +393,7 @@ if st.session_state.page == 3:
         file_name="bloco_de_notas_jogo.txt",
         mime="text/plain"
     )
+
 
 
 
