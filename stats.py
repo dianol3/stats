@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import time
 import os
+from streamlit_autorefresh import st_autorefresh
 
 
 st.set_page_config(page_title="Estatísticas Ao Vivo", layout="wide")
@@ -296,7 +297,6 @@ if st.session_state.page == 3:
             st.session_state.faltas_nossa = 0
             st.session_state.faltas_adversario = 0
             st.session_state.players['Tempo de Jogo'] = 0
-    from streamlit_extras.st_autorefresh import st_autorefresh
 
 
     # Atualiza automaticamente a cada 1 segundo (1000 ms)
@@ -395,6 +395,7 @@ if st.session_state.page == 3:
         file_name="bloco_de_notas_jogo.txt",
         mime="text/plain"
     )
+
 
 
 
