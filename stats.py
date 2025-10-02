@@ -75,115 +75,111 @@ def load_players(team_file):
 
 
 # ======================
-# Funções
+# Funções de renderização e utilitárias
 # ======================
 
-def remove_last_event(evento, jogador=None):
-    """
-    Remove a última ocorrência de um evento do log.
-    Se 'jogador' for fornecido, só remove eventos daquele jogador.
-    Função segura: não gera erro se o log estiver vazio.
-    """
-    if 'event_log' not in st.session_state or not st.session_state.event_log:
-        return  # nada para remover
-
-    # percorre o log de trás para frente
-    for i in reversed(range(len(st.session_state.event_log))):
-        entry = st.session_state.event_log[i]
-        if jogador:
-            if evento in entry and jogador in entry:
-                st.session_state.event_log.pop(i)
-                break
-        else:
-            if evento in entry:
-                st.session_state.event_log.pop(i)
-                break
-
-
-def log_event(descricao, value=1):
-    minutos = int(st.session_state.elapsed_time // 60)
-    segundos = int(st.session_state.elapsed_time % 60)
-    parte = "1ª Parte" if st.session_state.part == 1 else "2ª Parte"
-    
-    # Se for decremento, remover último log correspondente
-    if value < 0:
-        for i in reversed(range(len(st.session_state.event_log))):
-            if descricao in st.session_state.event_log[i]:
-                st.session_state.event_log.pop(i)
-                return  # remove apenas o último evento correspondente
-    
-    # Caso contrário, adicionar normalmente
-    st.session_state.event_log.append(f"{parte} {minutos:02d}:{segundos:02d} - {descricao}")
-
-def add_stat(idx, stat, value=1):
-    player_name = st.session_state.players.at[idx, 'Jogador']
-
-    if value < 0:
-        # Decrementa a estatística
-        st.session_state.players.at[idx, stat] = max(0, st.session_state.players.at[idx, stat] + value)
-
-        # Corrige placares/faltas
-        if stat == 'Golos':
-            st.session_state.score['Nossa'] = max(0, st.session_state.score['Nossa'] + value)
-            remove_last_event(f"Golo - {player_name}", player_name)
-
-        elif stat == 'Faltas Cometidas':
-            if st.session_state.playing_home:
-                st.session_state.faltas_nossa = max(0, st.session_state.faltas_nossa + value)
-            else:
-                st.session_state.faltas_adversario = max(0, st.session_state.faltas_adversario + value)
-            remove_last_event(f"Falta Cometida - {player_name}", player_name)
-
-        elif stat == 'Faltas Sofridas':
-            if st.session_state.playing_home:
-                st.session_state.faltas_adversario = max(0, st.session_state.faltas_adversario + value)
-            else:
-                st.session_state.faltas_nossa = max(0, st.session_state.faltas_nossa + value)
-            remove_last_event(f"Falta Sofrida - {player_name}", player_name)
-
-        elif stat in ['Amarelos', 'Vermelhos']:
-            # Corrige cor da linha automaticamente via style
-            st.session_state.players.at[idx, stat] = max(0, st.session_state.players.at[idx, stat])
-            remove_last_event(f"{stat} - {player_name}", player_name)
-
-        else:
-            # Outros stats
-            remove_last_event(f"{stat} - {player_name}", player_name)
-
-        return
-
-    # Incremento
-    st.session_state.players.at[idx, stat] += value
-    if stat == 'Golos':
-        st.session_state.score['Nossa'] += value
-        log_event(f"Golo - {player_name}")
-    elif stat == 'Faltas Cometidas':
-        if st.session_state.playing_home:
-            st.session_state.faltas_nossa += value
-        else:
-            st.session_state.faltas_adversario += value
-        log_event(f"Falta Cometida - {player_name}")
-    elif stat == 'Faltas Sofridas':
-        if st.session_state.playing_home:
-            st.session_state.faltas_adversario += value
-        else:
-            st.session_state.faltas_nossa += value
-        log_event(f"Falta Sofrida - {player_name}")
+def render_placar_faltas():
+    if st.session_state.playing_home:
+        placar_text = f"{team_names_map.get(st.session_state.team_name)} {st.session_state.score['Nossa']} - {st.session_state.score['Adversário']} {st.session_state.clube_adversario}"
+        faltas_text = f"Faltas: {st.session_state.faltas_nossa} / {st.session_state.faltas_adversario}"
     else:
-        log_event(f"{stat} - {player_name}")
+        placar_text = f"{st.session_state.clube_adversario} {st.session_state.score['Adversário']} - {team_names_map.get(st.session_state.team_name)} {st.session_state.score['Nossa']}"
+        faltas_text = f"Faltas: {st.session_state.faltas_adversario} / {st.session_state.faltas_nossa}"
+    st.markdown(f"### {placar_text}")
+    st.markdown(f"#### {faltas_text}")
 
-def substitute_player(idx_out, idx_in):
-    st.session_state.players.at[idx_out, 'Em jogo'] = False
-    st.session_state.players.at[idx_in, 'Em jogo'] = True
+def render_botao_golos_adversario():
+    col1, col2 = st.columns([1,1])
+    with col1:
+        if st.button("-1 Golo adv", key="golo_adversario_minus"):
+            st.session_state.score['Adversário'] = max(0, st.session_state.score['Adversário'] - 1)
+            remove_last_event("Golo Adversário")
+    with col2:
+        if st.button("+1 Golo adv", key="golo_adversario_plus"):
+            st.session_state.score['Adversário'] += 1
+            log_event("Golo Adversário")
 
-def update_time():
-    if st.session_state.game_started and st.session_state.start_time is not None:
-        current_elapsed = time.time() - st.session_state.start_time
-        delta = current_elapsed - st.session_state.elapsed_time
-        st.session_state.elapsed_time = current_elapsed
-        for idx, row in st.session_state.players.iterrows():
-            if row['Em jogo']:
-                st.session_state.players.at[idx, 'Tempo de Jogo'] += delta / 60
+def render_controles_jogo():
+    col1, col2, col3, col4 = st.columns(4)
+    with col1:
+        if st.button("▶️ Iniciar / Retomar"):
+            st.session_state.game_started = True
+            if st.session_state.start_time is None:
+                st.session_state.start_time = time.time() - st.session_state.elapsed_time
+    with col2:
+        if st.button("⏸️ Pausar"):
+            st.session_state.game_started = False
+    with col3:
+        if st.button("⏹️ Resetar"):
+            st.session_state.game_started = False
+            st.session_state.start_time = None
+            st.session_state.elapsed_time = 0
+            st.session_state.score = {"Nossa":0, "Adversário":0}
+            st.session_state.faltas_nossa = 0
+            st.session_state.faltas_adversario = 0
+            st.session_state.players['Tempo de Jogo'] = 0
+    with col4:
+        st.button("🔄 Atualizar")  # apenas força atualização
+
+def render_barra_eventos():
+    st.sidebar.subheader("Selecionar jogador")
+    em_jogo = st.session_state.players[st.session_state.players['Em jogo'] == True] if not st.session_state.players.empty else pd.DataFrame()
+    if em_jogo.empty:
+        return
+    selected_player = st.sidebar.selectbox("Jogador:", em_jogo['Jogador'])
+    idx = st.session_state.players[st.session_state.players['Jogador']==selected_player].index[0]
+
+    st.sidebar.subheader("Eventos")
+    eventos = ['Perdas de Bola','Recuperações','Remates à Baliza','Remates Fora','Defesas',
+               'Faltas Cometidas','Faltas Sofridas','Golos','Assistências','Amarelos','Vermelhos']
+    for ev in eventos:
+        col_ev = st.sidebar.columns([2,1,1])
+        col_ev[0].markdown(ev)
+        if st.session_state.game_started:
+            col_ev[1].button("-1", key=f"minus_{ev}", on_click=add_stat, args=(idx, ev, -1))
+            col_ev[2].button("+1", key=f"plus_{ev}", on_click=add_stat, args=(idx, ev, 1))
+        else:
+            col_ev[1].button("-1", key=f"minus_{ev}_disabled", disabled=True)
+            col_ev[2].button("+1", key=f"plus_{ev}_disabled", disabled=True)
+
+def render_substituicoes():
+    st.subheader("🔄 Substituições")
+    em_jogo = st.session_state.players[st.session_state.players['Em jogo'] == True] if not st.session_state.players.empty else pd.DataFrame()
+    banco = st.session_state.players[st.session_state.players['Em jogo'] == False] if not st.session_state.players.empty else pd.DataFrame()
+
+    if not em_jogo.empty and not banco.empty:
+        out_player = st.selectbox("Jogador a sair (Em jogo):", em_jogo['Jogador'], key='out_player')
+        in_player = st.selectbox("Jogador a entrar (Banco):", banco['Jogador'], key='in_player')
+        if st.button("Confirmar Substituição"):
+            idx_out = st.session_state.players[st.session_state.players['Jogador']==out_player].index[0]
+            idx_in = st.session_state.players[st.session_state.players['Jogador']==in_player].index[0]
+            substitute_player(idx_out, idx_in)
+            log_event(f"Substituição - Entra {in_player}, Sai {out_player}")
+
+def render_tabela_jogadores():
+    def style_player(row):
+        if row['Vermelhos'] > 0:
+            cor = 'background-color: red'
+        elif row['Amarelos'] > 0:
+            cor = 'background-color: yellow'
+        else:
+            cor = ''
+        return [cor]*len(row)
+    st.dataframe(st.session_state.players.style.apply(style_player, axis=1), use_container_width=True)
+
+def render_log_jogo():
+    st.subheader("📝 Bloco de Notas do Jogo")
+    if st.session_state.event_log:
+        for e in st.session_state.event_log:
+            st.markdown(f"- {e}")
+    else:
+        st.write("Ainda não há eventos registados.")
+    st.download_button(
+        label="📥 Download Bloco de Notas",
+        data="\n".join(st.session_state.event_log),
+        file_name="bloco_de_notas_jogo.txt",
+        mime="text/plain"
+    )
 
 # ======================
 # Página 1 - Configuração
@@ -238,175 +234,38 @@ if st.session_state.page == 2:
 # Página 3 - Jogo
 # ======================
 if st.session_state.page == 3:
-    if st.session_state.playing_home:
-        st.title(f"{team_names_map.get(st.session_state.team_name, st.session_state.team_name)} vs {st.session_state.clube_adversario}")
-    else:
-        st.title(f"{st.session_state.clube_adversario} vs {team_names_map.get(st.session_state.team_name, st.session_state.team_name)}")
-    
+    title = f"{team_names_map.get(st.session_state.team_name)} vs {st.session_state.clube_adversario}" \
+        if st.session_state.playing_home else \
+        f"{st.session_state.clube_adversario} vs {team_names_map.get(st.session_state.team_name)}"
+    st.title(title)
+
     # Cronómetro
     update_time()
-    if st.session_state.modalidade == "Futebol":
-        minutos = int(st.session_state.elapsed_time // 60)
-        segundos = int(st.session_state.elapsed_time % 60)
-    else:
-        tempo_restante = st.session_state.tempo_parte*60 - st.session_state.elapsed_time
-        minutos = int(tempo_restante // 60)
-        segundos = int(tempo_restante % 60)
-    
-    parte_texto = "1ª Parte" if st.session_state.part == 1 else "2ª Parte"
-    st.markdown(f"### ⏱️ {parte_texto} - Tempo: {minutos:02d}:{segundos:02d}")
-    
-    # Placar e faltas
-    if st.session_state.playing_home:
-        placar_text = f"{team_names_map.get(st.session_state.team_name)} {st.session_state.score['Nossa']} - {st.session_state.score['Adversário']} {st.session_state.clube_adversario}"
-        faltas_text = f"Faltas: {st.session_state.faltas_nossa} / {st.session_state.faltas_adversario}"
-    else:
-        placar_text = f"{st.session_state.clube_adversario} {st.session_state.score['Adversário']} - {team_names_map.get(st.session_state.team_name)} {st.session_state.score['Nossa']}"
-        faltas_text = f"Faltas: {st.session_state.faltas_adversario} / {st.session_state.faltas_nossa}"
-    
-    st.markdown(f"### {placar_text}")
-    st.markdown(f"#### {faltas_text}")
-    
-    # ======================
-    # Botão Golo do Adversário
-    # ======================
-    col_adv1, col_adv2 = st.columns([1,1])
-    with col_adv1:
-        if st.button("-1 Golo adv", key="golo_adversario_minus"):
-            st.session_state.score['Adversário'] -= 1
-            if st.session_state.score['Adversário'] < 0:
-                st.session_state.score['Adversário'] = 0
-            remove_last_event("Golo Adversário")
-    
-    with col_adv2:
-        if st.button("+1 Golo adv", key="golo_adversario_plus"):
-            st.session_state.score['Adversário'] += 1
-            log_event("Golo Adversário")
-    
-      
-    
-    # Botões de controle
-    col1, col2, col3, col4 = st.columns(4)
-    with col1:
-        if st.button("▶️ Iniciar / Retomar"):
-            st.session_state.game_started = True
-            if st.session_state.start_time is None:
-                st.session_state.start_time = time.time() - st.session_state.elapsed_time
-    with col2:
-        if st.button("⏸️ Pausar"):
-            st.session_state.game_started = False
-    with col3:
-        if st.button("⏹️ Resetar"):
-            st.session_state.game_started = False
-            st.session_state.start_time = None
-            st.session_state.elapsed_time = 0
-            st.session_state.score = {"Nossa":0, "Adversário":0}
-            st.session_state.faltas_nossa = 0
-            st.session_state.faltas_adversario = 0
-            st.session_state.players['Tempo de Jogo'] = 0
-    with col4:
-        if st.button("🔄 Atualizar"):
-            pass  # força atualização da página
-    
-    # Início 2ª parte / Final do jogo
-    if st.session_state.elapsed_time >= st.session_state.tempo_parte*60 and st.session_state.part == 1:
-        st.warning("⏸️ Intervalo - 1ª Parte terminada")
-        if st.button("Início 2ª Parte"):
-            st.session_state.part = 2
-            st.session_state.start_time = None
-            st.session_state.elapsed_time = 0
-            st.session_state.faltas_nossa = 0
-            st.session_state.faltas_adversario = 0
-    
-    if st.session_state.part == 2 and st.session_state.elapsed_time >= st.session_state.tempo_parte*60:
-        if st.button("Final do jogo"):
-            st.session_state.game_started = False
-            st.success("⚽ Jogo terminado!")
-    
-    # ======================
-    # Barra lateral de eventos
-    # ======================
-    st.sidebar.subheader("Selecionar jogador")
-    if 'players' in st.session_state and not st.session_state.players.empty and 'Em jogo' in st.session_state.players.columns:
-        em_jogo = st.session_state.players[st.session_state.players['Em jogo'] == True]
-    else:
-        em_jogo = pd.DataFrame()  # vazio, evita erros
-    if not em_jogo.empty:
-        selected_player = st.sidebar.selectbox("Jogador:", em_jogo['Jogador'])
-        idx = st.session_state.players[st.session_state.players['Jogador']==selected_player].index[0]
-    
-        st.sidebar.subheader("Eventos")
-        eventos = ['Perdas de Bola','Recuperações','Remates à Baliza','Remates Fora','Defesas','Faltas Cometidas','Faltas Sofridas','Golos','Assistências','Amarelos','Vermelhos']
-        for ev in eventos:
-            col_ev = st.sidebar.columns([2,1,1])
-            col_ev[0].markdown(ev)
-            if st.session_state.game_started:
-                if col_ev[2].button("+1", key=f"plus_{ev}"):
-                    add_stat(idx, ev, 1)
-                if col_ev[1].button("-1", key=f"minus_{ev}"):
-                    add_stat(idx, ev, -1)
+    tempo_total = st.session_state.elapsed_time if st.session_state.modalidade == "Futebol" else st.session_state.tempo_parte*60 - st.session_state.elapsed_time
+    minutos = int(tempo_total // 60)
+    segundos = int(tempo_total % 60)
+    st.markdown(f"### ⏱️ {'1ª Parte' if st.session_state.part==1 else '2ª Parte'} - Tempo: {minutos:02d}:{segundos:02d}")
 
-            else:
-                col_ev[1].button("-1", key=f"minus_{ev}_disabled", disabled=True)
-                col_ev[2].button("+1", key=f"plus_{ev}_disabled", disabled=True)
-    
-    
-    # ======================
-    # Substituições
-    # ======================
-    st.subheader("🔄 Substituições")
-    if 'players' in st.session_state and not st.session_state.players.empty and 'Em jogo' in st.session_state.players.columns:
-        em_jogo = st.session_state.players[st.session_state.players['Em jogo'] == True]
-        banco = st.session_state.players[st.session_state.players['Em jogo'] == False]
-    else:
-        em_jogo = pd.DataFrame()
-        banco = pd.DataFrame()
-    
-    if not em_jogo.empty and not banco.empty:
-        out_player = st.selectbox("Jogador a sair (Em jogo):", em_jogo['Jogador'], key='out_player')
-        in_player = st.selectbox("Jogador a entrar (Banco):", banco['Jogador'], key='in_player')
-        if st.button("Confirmar Substituição"):
-            idx_out = st.session_state.players[st.session_state.players['Jogador']==out_player].index[0]
-            idx_in = st.session_state.players[st.session_state.players['Jogador']==in_player].index[0]
-            substitute_player(idx_out, idx_in)
-            log_event(f"Substituição - Entra {in_player}, Sai {out_player}")  # regista evento
-    
-    
-    # ======================
-    # Tabela de jogadores
-    # ======================
-    def style_player(row):
-        if row['Vermelhos'] > 0:
-            cor = 'background-color: red'
-        elif row['Amarelos'] > 0:
-            cor = 'background-color: yellow'
-        else:
-            cor = ''
-        return [cor]*len(row)
-    
-        
-    st.dataframe(st.session_state.players.style.apply(style_player, axis=1), use_container_width=True)
-    
-    # ======================
-    # Bloco de Notas - Log do Jogo
-    # ======================
-    st.subheader("📝 Bloco de Notas do Jogo")
-    if 'event_log' in st.session_state and st.session_state.event_log:
-        for e in st.session_state.event_log:
-            st.markdown(f"- {e}")
-    else:
-        st.write("Ainda não há eventos registados.")
-    
-    # Botão para download do log
-    log_text = "\n".join(st.session_state.event_log)
-    st.download_button(
-        label="📥 Download Bloco de Notas",
-        data=log_text,
-        file_name="bloco_de_notas_jogo.txt",
-        mime="text/plain"
-    )
-    
-    
-    
+    # Renderização
+    render_placar_faltas()
+    render_botao_golos_adversario()
+    render_controles_jogo()
+    render_barra_eventos()
+    render_substituicoes()
+    render_tabela_jogadores()
+    render_log_jogo()
 
-
+    # Intervalo e final do jogo
+    if st.session_state.elapsed_time >= st.session_state.tempo_parte*60:
+        if st.session_state.part == 1:
+            st.warning("⏸️ Intervalo - 1ª Parte terminada")
+            if st.button("Início 2ª Parte"):
+                st.session_state.part = 2
+                st.session_state.start_time = None
+                st.session_state.elapsed_time = 0
+                st.session_state.faltas_nossa = 0
+                st.session_state.faltas_adversario = 0
+        elif st.session_state.part == 2:
+            if st.button("Final do jogo"):
+                st.session_state.game_started = False
+                st.success("⚽ Jogo terminado!")
