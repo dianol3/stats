@@ -1,7 +1,13 @@
-1;Luís
-4;Gui
-5;Zé
-6; joao
-7; manel
-3; Francisco
-8; joao francisco
+1;Luiz 
+4;Kiko
+5;Gui
+6;Diego
+8;Ritinha
+10;Enzo
+11;Sandro
+14;António
+15;Dinis
+16;Diogo
+17;Francisco
+18;Matilde
+31;Miguel
