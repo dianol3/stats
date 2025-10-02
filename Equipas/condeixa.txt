@@ -1,13 +1,19 @@
-1; Ariana
-2; Carol
-3; Carolina
-4; Alana
-5; Bia
-6; Laura
-7; Cássia
-8; Sara
-9; Gabi
-10; Camila
-11; Maria
-12; Júlia
-13; Kika
+1;Ariana
+2;Bia
+3;Carolina
+4;Kika
+5;Sara
+6;Carol
+7;Diana
+8;Laura
+9;Laurinha
+10;Maria
+11;Cássia
+12;Fran
+13;Gabi
+14;Mariana
+15;Camila
+16;Alana
+17;Eva
+18;Júlia
+19;Raquel
