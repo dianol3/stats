@@ -310,12 +310,11 @@ if st.session_state.page == 3:
             col_ev = st.sidebar.columns([2,1,1])
             col_ev[0].markdown(ev)
             if st.session_state.game_started:
-                if col_ev[2].button("+1", key=f"plus_{ev}"):  # incrementar
+                if col_ev[2].button("+1", key=f"plus_{ev}"):
                     add_stat(idx, ev, 1)
-                
-                if col_ev[1].button("-1", key=f"minus_{ev}"):  # decrementar
+                if col_ev[1].button("-1", key=f"minus_{ev}"):
                     add_stat(idx, ev, -1)
-    
+
             else:
                 col_ev[1].button("-1", key=f"minus_{ev}_disabled", disabled=True)
                 col_ev[2].button("+1", key=f"plus_{ev}_disabled", disabled=True)
@@ -346,13 +345,15 @@ if st.session_state.page == 3:
     # Tabela de jogadores
     # ======================
     def style_player(row):
-        cor = ''
         if row['Vermelhos'] > 0:
             cor = 'background-color: red'
         elif row['Amarelos'] > 0:
             cor = 'background-color: yellow'
+        else:
+            cor = ''
         return [cor]*len(row)
     
+        
     st.dataframe(st.session_state.players.style.apply(style_player, axis=1), use_container_width=True)
     
     # ======================
@@ -376,3 +377,4 @@ if st.session_state.page == 3:
     
     
     
+
