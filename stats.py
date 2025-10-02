@@ -298,7 +298,10 @@ if st.session_state.part == 2 and st.session_state.elapsed_time >= st.session_st
 # Barra lateral de eventos
 # ======================
 st.sidebar.subheader("Selecionar jogador")
-em_jogo = st.session_state.players[st.session_state.players['Em jogo']==True]
+if 'players' in st.session_state and not st.session_state.players.empty and 'Em jogo' in st.session_state.players.columns:
+    em_jogo = st.session_state.players[st.session_state.players['Em jogo'] == True]
+else:
+    em_jogo = pd.DataFrame()  # vazio, evita erros
 if not em_jogo.empty:
     selected_player = st.sidebar.selectbox("Jogador:", em_jogo['Jogador'])
     idx = st.session_state.players[st.session_state.players['Jogador']==selected_player].index[0]
