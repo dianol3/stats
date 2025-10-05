@@ -306,6 +306,26 @@ if st.session_state.page == 3:
             st.session_state.game_started = False
             st.success("⚽ Jogo terminado!")
 
+            # ======================
+            # Botão para guardar resultados
+            # ======================
+            if st.button("💾 Save Results"):
+                # Nome base do arquivo
+                data_str = time.strftime("%Y-%m-%d_%H-%M-%S")
+                base_filename = f"{data_str}_{st.session_state.team_name}_vs_{st.session_state.clube_adversario}"
+    
+                # 1️⃣ Guardar logbook
+                log_text = "\n".join(st.session_state.event_log)
+                log_path = os.path.join("results", base_filename + "_logbook.txt")
+                os.makedirs("results", exist_ok=True)
+                with open(log_path, "w", encoding="utf-8") as f:
+                    f.write(log_text)
+    
+                # 2️⃣ Guardar tabela de jogadores
+                tabela_path = os.path.join("results", base_filename + "_players.csv")
+                st.session_state.players.to_csv(tabela_path, index=False, encoding="utf-8-sig")
+    
+                st.success(f"Resultados guardados em 'results/'!\n- {log_path}\n- {tabela_path}")
 # ======================
 # Barra lateral - Eventos
 # ======================
