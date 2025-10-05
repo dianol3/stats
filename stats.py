@@ -11,7 +11,8 @@ JOGOS_DIR = "jogos"
 # Carregar o jogo selecionado
 if "jogo_selecionado" not in st.session_state:
     st.warning("Nenhum jogo selecionado. Volta à página principal.")
-    st.stop()
+    st.switch_page("main")  # Redireciona automaticamente para main.py
+    
 
 jogo_path = os.path.join(JOGOS_DIR, st.session_state.jogo_selecionado)
 if not os.path.exists(jogo_path):
@@ -458,6 +459,7 @@ if st.session_state.page == 3:
         file_name="bloco_de_notas_jogo.txt",
         mime="text/plain"
     )
+
 
 
 
