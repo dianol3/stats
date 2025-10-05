@@ -104,7 +104,7 @@ else:
         with col4:
             if st.button("▶️ Continuar", key=f"cont_{j['Ficheiro']}"):
                 st.session_state.jogo_selecionado = j["Ficheiro"]
-                st.switch_page("pages/stats")  # Nome da página multi-page sem .py
+                #st.switch_page("pages/stats")  # Nome da página multi-page sem .py
         with col5:
             if st.button("🗑️", key=f"del_{j['Ficheiro']}"):
                 os.remove(os.path.join(JOGOS_DIR, j["Ficheiro"]))
