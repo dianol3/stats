@@ -306,24 +306,41 @@ if st.session_state.page == 3:
             st.session_state.game_started = False
             st.success("⚽ Jogo terminado!")
 
-            # Nome base do arquivo
+            from github import Github
+
+            # Pega o token do Streamlit Secrets
+            token = st.secrets["GITHUB_TOKEN"]
+            g = Github(token)
+            
+            # Repositório no formato "usuario/repositorio"
+            repo = g.get_repo("TEU_USUARIO/TEU_REPOSITORIO")
+            
+            # Nome do ficheiro
             base_filename = f"{st.session_state.team_name}_VS_{st.session_state.clube_adversario}"
-        
-            # Criar pasta da equipa selecionada
-            pasta_equipe = os.path.join("results", st.session_state.team_name)
-            os.makedirs(pasta_equipe, exist_ok=True)
-        
-            # 1️⃣ Guardar logbook
+            
+            # Conteúdos
             log_text = "\n".join(st.session_state.event_log)
-            log_path = os.path.join(pasta_equipe, base_filename + "_logbook.txt")
-            with open(log_path, "w", encoding="utf-8") as f:
-                f.write(log_text)
-        
-            # 2️⃣ Guardar tabela de jogadores
-            tabela_path = os.path.join(pasta_equipe, base_filename + "_players.csv")
-            st.session_state.players.to_csv(tabela_path, index=False, encoding="utf-8-sig")
-        
-            st.success(f"Resultados guardados em '{pasta_equipe}'!\n- {log_path}\n- {tabela_path}")
+            players_csv = st.session_state.players.to_csv(index=False, encoding="utf-8-sig")
+            
+            # --- Guardar logbook ---
+            try:
+                repo.create_file(f"{st.session_state.team_name}/{base_filename}_logbook.txt",
+                                 f"Add logbook {base_filename}", log_text)
+            except:
+                # Se já existir, atualizar
+                contents = repo.get_contents(f"{st.session_state.team_name}/{base_filename}_logbook.txt")
+                repo.update_file(contents.path, f"Update logbook {base_filename}", log_text, contents.sha)
+            
+            # --- Guardar tabela de jogadores ---
+            try:
+                repo.create_file(f"{st.session_state.team_name}/{base_filename}_players.csv",
+                                 f"Add players table {base_filename}", players_csv)
+            except:
+                contents = repo.get_contents(f"{st.session_state.team_name}/{base_filename}_players.csv")
+                repo.update_file(contents.path, f"Update players table {base_filename}", players_csv, contents.sha)
+            
+            st.success("✅ Resultados guardados no GitHub!")
+
                 
 # ======================
 # Barra lateral - Eventos
