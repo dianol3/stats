@@ -31,6 +31,7 @@ with col3:
 
 tempo_parte = st.number_input("Duração da parte (minutos):", min_value=1, value=45)
 
+# Botão para criar novo jogo
 if st.button("✅ Iniciar novo jogo"):
     if equipa and adversario:
         filename = f"{datetime.now().strftime('%Y-%m-%d_%H-%M')}_{equipa}_vs_{adversario}.json"
@@ -52,11 +53,15 @@ if st.button("✅ Iniciar novo jogo"):
         }
         with open(filepath, "w", encoding="utf-8") as f:
             json.dump(novo_jogo, f)
+
+        # Guarda o ficheiro no session_state
         st.session_state.jogo_selecionado = filename
         st.success(f"✅ Novo jogo criado: {equipa} vs {adversario}")
-        st.switch_page("stats")
-    else:
-        st.warning("Preenche o nome da equipa e do adversário.")
+
+        # Redireciona para a página stats
+        # ✅ Aguarda o próximo rerun automático
+        st.experimental_set_query_params(page="stats")  # alternativo
+
 
 # ======================
 # Lista de jogos
