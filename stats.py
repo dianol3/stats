@@ -188,7 +188,8 @@ if st.session_state.page == 1:
         st.session_state.team_name = team_name
         load_players(team_name)
         st.session_state.page = 2
-     st.stop()
+        
+    st.stop()
 # ======================
 # Página 2 - Seleção dos Titulares
 # ======================
@@ -212,7 +213,8 @@ if st.session_state.page == 2:
             st.session_state.page = 3
     else:
         st.warning("O número de jogadores no ficheiro é menor que o número de titulares definido.")
-     st.stop()
+        
+    st.stop()
 # ======================
 # Página 3 - Jogo
 # ======================
