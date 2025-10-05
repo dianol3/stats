@@ -228,14 +228,15 @@ if 'page' not in st.session_state:
 
 if st.session_state.page == 'home':
     st.title("⚽ Estatísticas Ao Vivo")
+    
     escolha = st.radio("Escolha uma opção:", ["Novo Jogo", "Ver Jogos Guardados"], key="home_choice")
-
-    # Quando muda a escolha, atualiza a página
-    if escolha == "Novo Jogo":
-        st.session_state.page = 1
-    elif escolha == "Ver Jogos Guardados":
-        st.session_state.page = 'ver_jogos'
-    st.stop()
+    
+    if st.button("Confirmar Escolha"):
+        if escolha == "Novo Jogo":
+            st.session_state.page = 1
+        elif escolha == "Ver Jogos Guardados":
+            st.session_state.page = 'ver_jogos'
+st.stop()
 # ================
 # ver jogos
 # ===============
