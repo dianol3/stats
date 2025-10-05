@@ -221,6 +221,66 @@ base_filename = f"{st.session_state.team_name}_VS_{st.session_state.clube_advers
 # Pasta onde vai guardar os arquivos
 folder_path = st.session_state.team_name  # pasta com o nome da equipe selecionada
 
+# =================
+# Página 0
+# ==================
+
+if 'page' not in st.session_state:
+    st.session_state.page = 'home'
+
+if st.session_state.page == 'home':
+    st.title("⚽ Estatísticas Ao Vivo")
+    escolha = st.radio("Escolha uma opção:", ["Novo Jogo", "Ver Jogos Guardados"], key="home_choice")
+
+    # Quando muda a escolha, atualiza a página
+    if escolha == "Novo Jogo":
+        st.session_state.page = 1
+    elif escolha == "Ver Jogos Guardados":
+        st.session_state.page = 'ver_jogos'
+
+# ================
+# ver jogos
+# ===============
+if st.session_state.page == 'ver_jogos':
+    st.title("📂 Jogos Guardados")
+
+    # Listar pastas no repositório (cada pasta = equipa)
+    from github import Github
+    github_token = st.secrets["GITHUB_TOKEN"]
+    g = Github(github_token)
+    repo = g.get_repo("dianol3/stats")  # teu repo
+
+    contents = repo.get_contents("")  # raiz
+    pastas = [c.path for c in contents if c.type == 'dir']
+
+    if pastas:
+        pasta_selecionada = st.selectbox("Selecione a equipa:", pastas)
+
+        # Listar arquivos dentro da pasta
+        arquivos = repo.get_contents(pasta_selecionada)
+        arquivos_nomes = [a.name for a in arquivos]
+        arquivo_selecionado = st.selectbox("Selecione o arquivo:", arquivos_nomes)
+
+        if st.button("Ver arquivo"):
+            arquivo = repo.get_contents(f"{pasta_selecionada}/{arquivo_selecionado}")
+            conteudo = arquivo.decoded_content.decode("utf-8")
+            st.text_area("Conteúdo:", conteudo, height=400)
+
+            # Botão de download
+            st.download_button(
+                label="📥 Download do arquivo",
+                data=conteudo,
+                file_name=arquivo_selecionado,
+                mime="text/plain"
+            )
+    else:
+        st.write("Nenhuma pasta encontrada no repositório.")
+
+    # Botão para voltar à página inicial
+    if st.button("⬅️ Voltar"):
+        st.session_state.page = 'home'
+        pass
+
 # ======================
 # Página 1 - Configuração
 # ======================
