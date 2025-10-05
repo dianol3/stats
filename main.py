@@ -1,0 +1,97 @@
+import streamlit as st
+import os
+import json
+import pandas as pd
+from datetime import datetime
+
+st.set_page_config(page_title="Gestão de Jogos", layout="wide")
+
+# ======================
+# Configurações iniciais
+# ======================
+JOGOS_DIR = "jogos"
+os.makedirs(JOGOS_DIR, exist_ok=True)
+
+st.title("🏟️ Gestão de Jogos")
+
+# ======================
+# Criar novo jogo
+# ======================
+st.subheader("➕ Criar novo jogo")
+
+col1, col2, col3 = st.columns(3)
+with col1:
+    equipa = st.text_input("Nome da equipa (nossa):")
+with col2:
+    adversario = st.text_input("Nome do adversário:")
+with col3:
+    modalidade = st.selectbox("Modalidade:", ["Futebol", "Futsal"])
+
+tempo_parte = st.number_input("Duração da parte (minutos):", min_value=1, value=45)
+
+if st.button("✅ Iniciar novo jogo"):
+    if equipa and adversario:
+        filename = f"{datetime.now().strftime('%Y-%m-%d_%H-%M')}_{equipa}_vs_{adversario}.json"
+        filepath = os.path.join(JOGOS_DIR, filename)
+        novo_jogo = {
+            "equipa": equipa,
+            "adversario": adversario,
+            "modalidade": modalidade,
+            "tempo_parte": tempo_parte,
+            "score": {"nossa": 0, "adversario": 0},
+            "part": 1,
+            "elapsed_time": 0,
+            "faltas_nossa": 0,
+            "faltas_adversario": 0,
+            "players": [],
+            "event_log": [],
+            "estado": "em_andamento",
+            "data_criacao": datetime.now().isoformat(),
+        }
+        with open(filepath, "w", encoding="utf-8") as f:
+            json.dump(novo_jogo, f)
+        st.session_state.jogo_selecionado = filename
+        st.success(f"✅ Novo jogo criado: {equipa} vs {adversario}")
+        st.switch_page("stats.py")
+    else:
+        st.warning("Preenche o nome da equipa e do adversário.")
+
+# ======================
+# Lista de jogos
+# ======================
+st.subheader("📋 Jogos existentes")
+
+files = sorted(os.listdir(JOGOS_DIR), reverse=True)
+if not files:
+    st.info("Ainda não há jogos registados.")
+else:
+    jogos = []
+    for f in files:
+        path = os.path.join(JOGOS_DIR, f)
+        try:
+            with open(path, "r", encoding="utf-8") as jf:
+                data = json.load(jf)
+                jogos.append({
+                    "Ficheiro": f,
+                    "Equipa": data.get("equipa", "—"),
+                    "Adversário": data.get("adversario", "—"),
+                    "Modalidade": data.get("modalidade", "—"),
+                    "Estado": data.get("estado", "—"),
+                    "Data": data.get("data_criacao", "—")[:16].replace("T", " ")
+                })
+        except Exception as e:
+            st.error(f"Erro ao ler {f}: {e}")
+
+    for j in jogos:
+        col1, col2, col3, col4, col5 = st.columns([3,2,2,1,1])
+        col1.markdown(f"**{j['Equipa']} vs {j['Adversário']}**")
+        col2.write(f"📅 {j['Data']}")
+        col3.write(f"⚙️ {j['Estado']}")
+        with col4:
+            if st.button("▶️ Continuar", key=f"cont_{j['Ficheiro']}"):
+                st.session_state.jogo_selecionado = j["Ficheiro"]
+                st.switch_page("stats.py")
+        with col5:
+            if st.button("🗑️", key=f"del_{j['Ficheiro']}"):
+                os.remove(os.path.join(JOGOS_DIR, j["Ficheiro"]))
+                st.experimental_rerun()
