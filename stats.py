@@ -242,12 +242,20 @@ if st.session_state.page == 3:
     update_time()
 
     if st.session_state.modalidade == "Futebol":
-        minutos = int(st.session_state.elapsed_time // 60)
-        segundos = int(st.session_state.elapsed_time % 60)
+    minutos = int(st.session_state.elapsed_time // 60)
+    segundos = int(st.session_state.elapsed_time % 60)
     else:
+        # Futsal - contagem decrescente
         tempo_restante = st.session_state.tempo_parte*60 - st.session_state.elapsed_time
-        minutos = int(tempo_restante // 60)
-        segundos = int(tempo_restante % 60)
+        if tempo_restante >= 0:
+            minutos = int(tempo_restante // 60)
+            segundos = int(tempo_restante % 60)
+        else:
+            # tempo negativo: -0:01, -0:02, etc
+            tempo_neg = abs(tempo_restante)
+            minutos = -(int(tempo_neg // 60))
+            segundos = int(tempo_neg % 60)
+    
     parte_texto = "1ª Parte" if st.session_state.part == 1 else "2ª Parte"
     st.markdown(f"### ⏱️ {parte_texto} - Tempo: {minutos:02d}:{segundos:02d}")
 
@@ -309,11 +317,11 @@ if st.session_state.page == 3:
             from github import Github
 
             # Pega o token do Streamlit Secrets
-            token = st.secrets["GITHUB_TOKEN"]
+            token = st.secrets["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"]
             g = Github(token)
             
             # Repositório no formato "usuario/repositorio"
-            repo = g.get_repo("TEU_USUARIO/TEU_REPOSITORIO")
+            repo = g.get_repo("dianol3/stats")
             
             # Nome do ficheiro
             base_filename = f"{st.session_state.team_name}_VS_{st.session_state.clube_adversario}"
