@@ -236,7 +236,7 @@ if st.session_state.page == 'home':
             st.session_state.page = 1
         elif escolha == "Ver Jogos Guardados":
             st.session_state.page = 'ver_jogos'
-st.stop()
+    st.stop()
 # ================
 # ver jogos
 # ===============
