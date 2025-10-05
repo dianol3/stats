@@ -98,14 +98,22 @@ def load_players(team_file):
 # Funções auxiliares
 # ======================
 def create_or_update_file(repo, path, commit_message, content):
-    """
-    Cria um arquivo no GitHub se não existir ou atualiza se já existir.
-    """
     try:
-        repo.create_file(path, commit_message, content)
-    except:
         contents = repo.get_contents(path)
+        # arquivo existe → atualizar
         repo.update_file(contents.path, commit_message, content, contents.sha)
+    except:
+        # arquivo não existe → criar
+        # garantir que a pasta existe no repo
+        parts = path.split('/')
+        if len(parts) > 1:
+            folder = '/'.join(parts[:-1])
+            try:
+                repo.get_contents(folder)
+            except:
+                # criar pasta vazia no GitHub não é possível diretamente, mas podemos criar arquivo .gitkeep
+                repo.create_file(f"{folder}/.gitkeep", "Criar pasta", "")
+        repo.create_file(path, commit_message, content)
 
 def remove_last_event(evento, jogador=None):
     if 'event_log' not in st.session_state or not st.session_state.event_log:
