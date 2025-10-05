@@ -204,6 +204,23 @@ def update_time():
             if row['Em jogo']:
                 st.session_state.players.at[idx, 'Tempo de Jogo'] += delta / 60
 
+from github import Github
+    
+# Pegar o token do Streamlit Secrets
+github_token = st.secrets["GITHUB_TOKEN"]
+
+# Criar objeto GitHub
+g = Github(github_token)
+
+# Repositório
+repo = g.get_repo("dianol3/stats")  # substitua pelo seu repo
+
+# Nome base do arquivo
+base_filename = f"{st.session_state.team_name}_VS_{st.session_state.clube_adversario}"
+
+# Pasta onde vai guardar os arquivos
+folder_path = st.session_state.team_name  # pasta com o nome da equipe selecionada
+
 # ======================
 # Página 1 - Configuração
 # ======================
@@ -257,24 +274,6 @@ if st.session_state.page == 2:
 # Página 3 - Jogo
 # ======================
 if st.session_state.page == 3:
-
-    from github import Github
-    
-    # Pegar o token do Streamlit Secrets
-    github_token = st.secrets["GITHUB_TOKEN"]
-    
-    # Criar objeto GitHub
-    g = Github(github_token)
-    
-    # Repositório
-    repo = g.get_repo("dianol3/stats")  # substitua pelo seu repo
-    
-    # Nome base do arquivo
-    base_filename = f"{st.session_state.team_name}_VS_{st.session_state.clube_adversario}"
-    
-    # Pasta onde vai guardar os arquivos
-    folder_path = st.session_state.team_name  # pasta com o nome da equipe selecionada
-
     if st.session_state.playing_home:
         st.title(f"{team_names_map.get(st.session_state.team_name, st.session_state.team_name)} vs {st.session_state.clube_adversario}")
     else:
