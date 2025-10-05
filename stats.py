@@ -268,9 +268,9 @@ if st.session_state.page == 2:
     else:
         st.warning("O número de jogadores no ficheiro é menor que o número de titulares definido.")
 
-%----------------------------
-% Save game
-%----------------------------
+#----------------------------
+# Save game
+#----------------------------
 def save_game():
     """Guarda o estado atual do jogo no ficheiro JSON"""
     jogo_data = {
@@ -458,6 +458,7 @@ if st.session_state.page == 3:
         file_name="bloco_de_notas_jogo.txt",
         mime="text/plain"
     )
+
 
 
 
