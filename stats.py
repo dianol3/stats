@@ -521,4 +521,4 @@ if st.session_state.event_log:
         st.markdown(f"- {e}")
 else:
     st.write("Ainda não há eventos registados.")
-)
+
