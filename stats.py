@@ -344,32 +344,35 @@ if st.session_state.page == 2:
         st.warning("O número de jogadores no ficheiro é menor que o número de titulares definido.")
         
     st.stop()
+
 # ======================
-# Página 3 - Jogo
+# Página 3 - Jogo otimizado
 # ======================
 if st.session_state.page == 3:
+    # Título
     if st.session_state.playing_home:
         st.title(f"{team_names_map.get(st.session_state.team_name, st.session_state.team_name)} vs {st.session_state.clube_adversario}")
     else:
         st.title(f"{st.session_state.clube_adversario} vs {team_names_map.get(st.session_state.team_name, st.session_state.team_name)}")
 
-    update_time()
+    # Atualizar tempo
+    if st.session_state.game_started and st.session_state.start_time is not None:
+        st.session_state.elapsed_time = time.time() - st.session_state.start_time
 
+    # Cronômetro
     if st.session_state.modalidade == "Futebol":
         minutos = int(st.session_state.elapsed_time // 60)
         segundos = int(st.session_state.elapsed_time % 60)
     else:
-        # Futsal - contagem decrescente
         tempo_restante = st.session_state.tempo_parte*60 - st.session_state.elapsed_time
         if tempo_restante >= 0:
             minutos = int(tempo_restante // 60)
             segundos = int(tempo_restante % 60)
         else:
-            # tempo negativo: -0:01, -0:02, etc
             tempo_neg = abs(tempo_restante)
             minutos = -(int(tempo_neg // 60))
             segundos = int(tempo_neg % 60)
-    
+
     parte_texto = "1ª Parte" if st.session_state.part == 1 else "2ª Parte"
     st.markdown(f"### ⏱️ {parte_texto} - Tempo: {minutos:02d}:{segundos:02d}")
 
@@ -380,84 +383,59 @@ if st.session_state.page == 3:
     else:
         placar_text = f"{st.session_state.clube_adversario} {st.session_state.score['Adversário']} - {team_names_map.get(st.session_state.team_name)} {st.session_state.score['Nossa']}"
         faltas_text = f"Faltas: {st.session_state.faltas_adversario} / {st.session_state.faltas_nossa}"
-
     st.markdown(f"### {placar_text}")
     st.markdown(f"#### {faltas_text}")
 
     # ----------------------------------
-    # Descontos tempo
-    # ---------------------------------
-    parte_atual = st.session_state.part
-    
-    # Inicializar estados de desconto se não existirem
-    if 'desconto_nossa' not in st.session_state:
-        st.session_state.desconto_nossa = {1: False, 2: False}
-    if 'desconto_adversario' not in st.session_state:
-        st.session_state.desconto_adversario = {1: False, 2: False}
-
-    # Botões Golo do Adversário
-    col_adv1, col_adv2 = st.columns([1, 1])
-    with col_adv1:
-        if st.button("-1 Golo adv", key="golo_adversario_minus"):
-            st.session_state.score['Adversário'] -= 1
-            if st.session_state.score['Adversário'] < 0:
-                st.session_state.score['Adversário'] = 0
-            remove_last_event("Golo Adversário")
-    with col_adv2:
-        if st.button("+1 Golo adv", key="golo_adversario_plus"):
-            st.session_state.score['Adversário'] += 1
-            log_event("Golo Adversário")
-
-    # Controlo do jogo + Descontos de tempo
+    # Controlo do Jogo e Descontos
+    # ----------------------------------
     col1, col2, col3, col4 = st.columns(4)
-    
-    # ▶️ Iniciar / Retomar
     with col1:
         if st.button("▶️ Iniciar / Retomar"):
             if not st.session_state.game_started:
                 st.session_state.game_started = True
                 st.session_state.start_time = time.time() - st.session_state.elapsed_time
-    
-    # ⏸️ Pausar
     with col2:
         if st.button("⏸️ Pausar"):
             if st.session_state.game_started:
-                current_elapsed = time.time() - st.session_state.start_time
-                st.session_state.elapsed_time = current_elapsed
+                st.session_state.elapsed_time = time.time() - st.session_state.start_time
                 st.session_state.game_started = False
                 st.session_state.start_time = None
-    
-    # Desconto tempo – Equipa da casa
     with col3:
         if st.session_state.part not in st.session_state.get('desconto_casa_part', {}):
             if st.button(f"⏱️ Desconto {team_names_map.get(st.session_state.team_name, st.session_state.team_name)}"):
-                minutos = int(st.session_state.elapsed_time // 60)
-                segundos = int(st.session_state.elapsed_time % 60)
-                parte = "1ª Parte" if st.session_state.part == 1 else "2ª Parte"
                 st.session_state.event_log.append(
-                    f"{parte} {minutos:02d}:{segundos:02d} - Desconto tempo {team_names_map.get(st.session_state.team_name)}"
+                    f"{parte_texto} {minutos:02d}:{segundos:02d} - Desconto tempo {st.session_state.team_name}"
                 )
                 if 'desconto_casa_part' not in st.session_state:
                     st.session_state.desconto_casa_part = {}
                 st.session_state.desconto_casa_part[st.session_state.part] = True
-    
-    # Botão Desconto para equipa visitante
     with col4:
         if st.session_state.part not in st.session_state.get('desconto_visit_part', {}):
             if st.button(f"⏱️ Desconto {st.session_state.clube_adversario}"):
-                minutos = int(st.session_state.elapsed_time // 60)
-                segundos = int(st.session_state.elapsed_time % 60)
-                parte = "1ª Parte" if st.session_state.part == 1 else "2ª Parte"
                 st.session_state.event_log.append(
-                    f"{parte} {minutos:02d}:{segundos:02d} - Desconto tempo {st.session_state.clube_adversario}"
+                    f"{parte_texto} {minutos:02d}:{segundos:02d} - Desconto tempo {st.session_state.clube_adversario}"
                 )
                 if 'desconto_visit_part' not in st.session_state:
                     st.session_state.desconto_visit_part = {}
                 st.session_state.desconto_visit_part[st.session_state.part] = True
 
-    st_autorefresh(interval=1000, key="refresh")
+    # ----------------------------------
+    # Botões de Golo Adversário
+    # ----------------------------------
+    col_adv1, col_adv2 = st.columns([1, 1])
+    with col_adv1:
+        if st.button("-1 Golo adv"):
+            st.session_state.score['Adversário'] = max(0, st.session_state.score['Adversário'] - 1)
+            remove_last_event("Golo Adversário")
+    with col_adv2:
+        if st.button("+1 Golo adv"):
+            st.session_state.score['Adversário'] += 1
+            log_event("Golo Adversário")
 
-    # Início 2ª parte / Final do jogo
+    # ----------------------------------
+    # Início 2ª parte / Final do Jogo
+    # ----------------------------------
     if st.session_state.elapsed_time >= st.session_state.tempo_parte*60 and st.session_state.part == 1:
         st.warning("⏸️ Intervalo - 1ª Parte terminada")
         if st.button("Início 2ª Parte"):
@@ -469,6 +447,51 @@ if st.session_state.page == 3:
             titulares = st.session_state.players[st.session_state.players['Em jogo'] == True]
             nomes = ", ".join(titulares['Jogador'])
             log_event(f"Titulares da 2ª parte: {nomes}", value=0)
+
+    # ----------------------------------
+    # Substituições
+    # ----------------------------------
+    st.subheader("🔄 Substituições")
+    em_jogo = st.session_state.players[st.session_state.players['Em jogo'] == True]
+    banco = st.session_state.players[st.session_state.players['Em jogo'] == False]
+
+    if not em_jogo.empty and not banco.empty:
+        out_player = st.selectbox("Jogador a sair (Em jogo):", em_jogo['Jogador'], key='out_player')
+        in_player = st.selectbox("Jogador a entrar (Banco):", banco['Jogador'], key='in_player')
+        if st.button("Confirmar Substituição"):
+            idx_out = st.session_state.players[st.session_state.players['Jogador']==out_player].index[0]
+            idx_in = st.session_state.players[st.session_state.players['Jogador']==in_player].index[0]
+            substitute_player(idx_out, idx_in)
+            log_event(f"Substituição - Entra {in_player}, Sai {out_player}")
+
+    # ----------------------------------
+    # Tabela de Jogadores
+    # ----------------------------------
+    def style_player(row):
+        if row['Vermelhos'] > 0:
+            cor = 'background-color: red'
+        elif row['Amarelos'] > 0:
+            cor = 'background-color: yellow'
+        else:
+            cor = ''
+        return [cor]*len(row)
+
+    st.dataframe(st.session_state.players.style.apply(style_player, axis=1), use_container_width=True)
+
+    # ----------------------------------
+    # Bloco de Notas - Log do Jogo
+    # ----------------------------------
+    st.subheader("📝 Bloco de Notas do Jogo")
+    if st.session_state.event_log:
+        for e in st.session_state.event_log:
+            st.markdown(f"- {e}")
+    else:
+        st.write("Ainda não há eventos registados.")
+
+    # ----------------------------------
+    # Auto-refresh do cronômetro
+    # ----------------------------------
+    st_autorefresh(interval=1000, key="refresh")
                 
 # ======================
 # Barra lateral - Eventos
