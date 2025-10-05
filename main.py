@@ -55,15 +55,15 @@ if st.button("✅ Iniciar novo jogo"):
         with open(filepath, "w", encoding="utf-8") as f:
             json.dump(novo_jogo, f)
 
-        # Guarda no session_state que queremos ir para stats
+        # Guarda no session_state
         st.session_state.jogo_selecionado = filename
-        st.session_state.ir_para_stats = True  # flag
+        st.session_state.ir_para_stats = True  # Flag de redirecionamento
         st.success(f"✅ Novo jogo criado: {equipa} vs {adversario}")
 
 # Redireciona se a flag estiver definida
 if st.session_state.get("ir_para_stats", False):
     st.session_state.ir_para_stats = False  # reset
-    st.experimental_rerun()  # força rerun, stats.py será carregado no próximo rerun
+    st.experimental_rerun()  # Força rerun, stats.py será carregado
 
 # ======================
 # Lista de jogos
