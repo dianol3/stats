@@ -263,6 +263,7 @@ if st.session_state.page == 2:
                 st.session_state.players.at[idx, 'Em jogo'] = True
                 st.session_state.titulares_1a_parte = jogadores_selecionados.copy()
                 log_event("Titulares 1ª Parte: " + ", ".join(jogadores_selecionados))
+                save_game()
             st.session_state.page = 3  # Página do jogo
     else:
         st.warning("O número de jogadores no ficheiro é menor que o número de titulares definido.")
@@ -374,6 +375,7 @@ if st.session_state.page == 3:
             titulares_2a_parte = st.session_state.players[st.session_state.players['Em jogo'] == True]['Jogador'].tolist()
             st.session_state.titulares_2a_parte = titulares_2a_parte
             log_event("Titulares 2ª Parte: " + ", ".join(titulares_2a_parte))
+            save_game()
 
 
     if st.session_state.part == 2 and st.session_state.elapsed_time >= st.session_state.tempo_parte*60:
@@ -456,6 +458,7 @@ if st.session_state.page == 3:
         file_name="bloco_de_notas_jogo.txt",
         mime="text/plain"
     )
+
 
 
 
