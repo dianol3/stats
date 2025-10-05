@@ -242,8 +242,8 @@ if st.session_state.page == 3:
     update_time()
 
     if st.session_state.modalidade == "Futebol":
-    minutos = int(st.session_state.elapsed_time // 60)
-    segundos = int(st.session_state.elapsed_time % 60)
+        minutos = int(st.session_state.elapsed_time // 60)
+        segundos = int(st.session_state.elapsed_time % 60)
     else:
         # Futsal - contagem decrescente
         tempo_restante = st.session_state.tempo_parte*60 - st.session_state.elapsed_time
