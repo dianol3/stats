@@ -317,7 +317,7 @@ if st.session_state.page == 3:
             from github import Github
 
             # Pega o token do Streamlit Secrets
-            GITHUB_TOKEN="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"
+            GITHUB_TOKEN="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"
             token = st.secrets["GITHUB_TOKEN"]
             g = Github(token)
             
