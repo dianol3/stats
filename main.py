@@ -54,7 +54,7 @@ if st.button("✅ Iniciar novo jogo"):
             json.dump(novo_jogo, f)
         st.session_state.jogo_selecionado = filename
         st.success(f"✅ Novo jogo criado: {equipa} vs {adversario}")
-        st.switch_page("stats.py")
+        st.switch_page("stats")
     else:
         st.warning("Preenche o nome da equipa e do adversário.")
 
