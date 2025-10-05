@@ -277,11 +277,11 @@ if st.session_state.page == 'ver_jogos':
     else:
         st.write("Nenhuma pasta encontrada no repositório.")
 
-# Botão para voltar à página inicial
-if st.button("⬅️ Voltar", key="voltar_home1"):
-    st.session_state.page = 'home'
+    # Botão para voltar à página inicial
+    if st.button("⬅️ Voltar", key="voltar_home_verjogos"):
+        st.session_state.page = 'home'
+        st.stop()
     st.stop()
-st.stop()
 
 # ======================
 # Página 1 - Configuração
@@ -303,11 +303,11 @@ if st.session_state.page == 1:
         st.session_state.team_name = team_name
         load_players(team_name)
         st.session_state.page = 2
-
-# Botão para voltar à página inicial
-if st.button("⬅️ Voltar", key="voltar_home"):
-    st.session_state.page = 'home'
-st.stop()
+    
+    # Botão para voltar à página inicial
+    if st.button("⬅️ Voltar", key="voltar_home"):
+        st.session_state.page = 'home'
+    st.stop()
 # ======================
 # Página 2 - Seleção dos Titulares
 # ======================
