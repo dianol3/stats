@@ -99,6 +99,16 @@ def load_players(team_file):
 # ======================
 # Funções auxiliares
 # ======================
+def create_or_update_file(repo, path, commit_message, content):
+    """
+    Cria um arquivo no GitHub se não existir ou atualiza se já existir.
+    """
+    try:
+        repo.create_file(path, commit_message, content)
+    except:
+        contents = repo.get_contents(path)
+        repo.update_file(contents.path, commit_message, content, contents.sha)
+
 def remove_last_event(evento, jogador=None):
     if 'event_log' not in st.session_state or not st.session_state.event_log:
         return
@@ -117,12 +127,25 @@ def log_event(descricao, value=1):
     minutos = int(st.session_state.elapsed_time // 60)
     segundos = int(st.session_state.elapsed_time % 60)
     parte = "1ª Parte" if st.session_state.part == 1 else "2ª Parte"
+
+    # Para remover eventos (se value < 0)
     if value < 0:
         for i in reversed(range(len(st.session_state.event_log))):
             if descricao in st.session_state.event_log[i]:
                 st.session_state.event_log.pop(i)
-                return
+                break
+        return
+
+    # Adicionar evento
     st.session_state.event_log.append(f"{parte} {minutos:02d}:{segundos:02d} - {descricao}")
+
+    # --- Atualizar GitHub ---
+    log_text = "\n".join(st.session_state.event_log)
+    players_csv = st.session_state.players.to_csv(index=False, encoding="utf-8-sig")
+
+    create_or_update_file(repo, f"{folder_path}/{base_filename}_logbook.txt", f"Update logbook {base_filename}", log_text)
+    create_or_update_file(repo, f"{folder_path}/{base_filename}_players.csv", f"Update players table {base_filename}", players_csv)
+
 
 def add_stat(idx, stat, value=1):
     player_name = st.session_state.players.at[idx, 'Jogador']
@@ -234,6 +257,24 @@ if st.session_state.page == 2:
 # Página 3 - Jogo
 # ======================
 if st.session_state.page == 3:
+
+    from github import Github
+    
+    # Pegar o token do Streamlit Secrets
+    github_token = st.secrets["GITHUB_TOKEN"]
+    
+    # Criar objeto GitHub
+    g = Github(github_token)
+    
+    # Repositório
+    repo = g.get_repo("dianol3/stats")  # substitua pelo seu repo
+    
+    # Nome base do arquivo
+    base_filename = f"{st.session_state.team_name}_VS_{st.session_state.clube_adversario}"
+    
+    # Pasta onde vai guardar os arquivos
+    folder_path = st.session_state.team_name  # pasta com o nome da equipe selecionada
+
     if st.session_state.playing_home:
         st.title(f"{team_names_map.get(st.session_state.team_name, st.session_state.team_name)} vs {st.session_state.clube_adversario}")
     else:
@@ -360,46 +401,6 @@ if st.session_state.page == 3:
         if st.button("Final do jogo"):
             st.session_state.game_started = False
             st.success("⚽ Jogo terminado!")
-
-            from github import Github
-
-            # Token
-            github_token = st.secrets["GITHUB_TOKEN"]
-            g = Github(github_token)
-            
-            # Repositório
-            repo = g.get_repo("dianol3/stats")
-            
-            # Nome do ficheiro
-            base_filename = f"{st.session_state.team_name}_VS_{st.session_state.clube_adversario}"
-            
-            # Conteúdos
-            log_text = "\n".join(st.session_state.event_log)
-            players_csv = st.session_state.players.to_csv(index=False, encoding="utf-8-sig")
-            
-            # Pasta no repositório
-            folder_path = f"{st.session_state.team_name}"
-            
-            # Função auxiliar para criar ou atualizar arquivo
-            def create_or_update_file(repo, path, message, content):
-                try:
-                    repo.create_file(path, message, content)
-                except Exception as e:
-                    # Se já existir, atualizar
-                    try:
-                        contents = repo.get_contents(path)
-                        repo.update_file(contents.path, message, content, contents.sha)
-                    except Exception as ee:
-                        st.error(f"Erro ao criar/atualizar {path}: {ee}")
-            
-            # --- Guardar logbook ---
-            create_or_update_file(repo, f"{folder_path}/{base_filename}_logbook.txt", f"Add logbook {base_filename}", log_text)
-            
-            # --- Guardar tabela de jogadores ---
-            create_or_update_file(repo, f"{folder_path}/{base_filename}_players.csv", f"Add players table {base_filename}", players_csv)
-            
-            st.success("✅ Resultados guardados no GitHub!")
-
                 
 # ======================
 # Barra lateral - Eventos
