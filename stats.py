@@ -222,7 +222,9 @@ if st.session_state.page == 2:
             for jogador in jogadores_selecionados:
                 idx = st.session_state.players[st.session_state.players['Jogador'] == jogador].index[0]
                 st.session_state.players.at[idx, 'Em jogo'] = True
-                log_event(f"Titular da { '1ª' if st.session_state.part == 1 else '2ª' } parte - {jogador}", value=0)
+                titulares = st.session_state.players[st.session_state.players['Em jogo'] == True]
+                nomes = ", ".join(titulares['Jogador'])
+                log_event(f"Titulares da 1ª parte: {nomes}", value=0)
             st.session_state.page = 3
     else:
         st.warning("O número de jogadores no ficheiro é menor que o número de titulares definido.")
@@ -295,10 +297,9 @@ if st.session_state.page == 3:
             st.session_state.elapsed_time = 0
             st.session_state.faltas_nossa = 0
             st.session_state.faltas_adversario = 0
-            # Registrar titulares da 2ª parte no log
             titulares = st.session_state.players[st.session_state.players['Em jogo'] == True]
-            for _, jogador in titulares.iterrows():
-                log_event(f"Titular da 2ª parte - {jogador['Jogador']}", value=0)
+            nomes = ", ".join(titulares['Jogador'])
+            log_event(f"Titulares da 2ª parte: {nomes}", value=0)
 
     if st.session_state.part == 2 and st.session_state.elapsed_time >= st.session_state.tempo_parte*60:
         if st.button("Final do jogo"):
