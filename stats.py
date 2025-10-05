@@ -237,9 +237,11 @@ if st.session_state.page == 'home':
         elif escolha == "Ver Jogos Guardados":
             st.session_state.page = 'ver_jogos'
     st.stop()
+    
 # ================
 # ver jogos
 # ===============
+
 if st.session_state.page == 'ver_jogos':
     st.title("📂 Jogos Guardados")
 
@@ -280,9 +282,11 @@ if st.button("⬅️ Voltar", key="voltar_home1"):
     st.session_state.page = 'home'
     st.stop()
 st.stop()
+
 # ======================
 # Página 1 - Configuração
 # ======================
+
 if st.session_state.page == 1:
     st.title("⚽ Configuração do Jogo")
     modalidade = st.selectbox("Selecione a modalidade:", ["Futebol", "Futsal"])
@@ -303,7 +307,7 @@ if st.session_state.page == 1:
 # Botão para voltar à página inicial
 if st.button("⬅️ Voltar", key="voltar_home"):
     st.session_state.page = 'home'
-    st.stop()
+st.stop()
 # ======================
 # Página 2 - Seleção dos Titulares
 # ======================
