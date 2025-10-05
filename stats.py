@@ -344,10 +344,12 @@ if st.session_state.page == 3:
 
             from github import Github
 
-            # Pega o token do Streamlit Secrets
-            GITHUB_TOKEN="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"
-            token = st.secrets["GITHUB_TOKEN"]
-            g = Github(token)
+            # ✅ Primeiro pega o token em uma variável
+            github_token = st.secrets["GITHUB_TOKEN"]
+            
+            # Depois cria o objeto Github
+            g = Github(github_token)
+
             
             # Repositório no formato "usuario/repositorio"
             repo = g.get_repo("dianol3/stats")
