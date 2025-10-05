@@ -276,7 +276,7 @@ if st.session_state.page == 'ver_jogos':
         st.write("Nenhuma pasta encontrada no repositório.")
 
 # Botão para voltar à página inicial
-if st.button("⬅️ Voltar"):
+if st.button("⬅️ Voltar", key="voltar_home"):
     st.session_state.page = 'home'
     st.stop()
 # ======================
@@ -300,7 +300,7 @@ if st.session_state.page == 1:
         st.session_state.page = 2
 
 # Botão para voltar à página inicial
-if st.button("⬅️ Voltar"):
+if st.button("⬅️ Voltar", key="voltar_home"):
     st.session_state.page = 'home'
     st.stop()
 # ======================
