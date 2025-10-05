@@ -332,29 +332,31 @@ if st.session_state.page == 3:
     
     # Desconto tempo – Equipa da casa
     with col3:
-        if 'desconto_casa_usado' not in st.session_state:
-            st.session_state.desconto_casa_usado = False
         if st.session_state.part not in st.session_state.get('desconto_casa_part', {}):
             if st.button(f"⏱️ Desconto {team_names_map.get(st.session_state.team_name, st.session_state.team_name)}"):
-                st.session_state.elapsed_time -= 60  # 1 minuto de desconto
-                st.session_state.desconto_casa_usado = True
-                st.session_state.event_log.append(f"{'1ª' if st.session_state.part==1 else '2ª'} Parte 00:00 - Desconto tempo {team_names_map.get(st.session_state.team_name)}")
+                minutos = int(st.session_state.elapsed_time // 60)
+                segundos = int(st.session_state.elapsed_time % 60)
+                parte = "1ª Parte" if st.session_state.part == 1 else "2ª Parte"
+                st.session_state.event_log.append(
+                    f"{parte} {minutos:02d}:{segundos:02d} - Desconto tempo {team_names_map.get(st.session_state.team_name)}"
+                )
                 if 'desconto_casa_part' not in st.session_state:
                     st.session_state.desconto_casa_part = {}
                 st.session_state.desconto_casa_part[st.session_state.part] = True
     
-    # Desconto tempo – Equipa visitante
+    # Botão Desconto para equipa visitante
     with col4:
-        if 'desconto_visitante_usado' not in st.session_state:
-            st.session_state.desconto_visitante_usado = False
-        if st.session_state.part not in st.session_state.get('desconto_visitante_part', {}):
+        if st.session_state.part not in st.session_state.get('desconto_visit_part', {}):
             if st.button(f"⏱️ Desconto {st.session_state.clube_adversario}"):
-                st.session_state.elapsed_time -= 60  # 1 minuto de desconto
-                st.session_state.desconto_visitante_usado = True
-                st.session_state.event_log.append(f"{'1ª' if st.session_state.part==1 else '2ª'} Parte 00:00 - Desconto tempo {st.session_state.clube_adversario}")
-                if 'desconto_visitante_part' not in st.session_state:
-                    st.session_state.desconto_visitante_part = {}
-                st.session_state.desconto_visitante_part[st.session_state.part] = True
+                minutos = int(st.session_state.elapsed_time // 60)
+                segundos = int(st.session_state.elapsed_time % 60)
+                parte = "1ª Parte" if st.session_state.part == 1 else "2ª Parte"
+                st.session_state.event_log.append(
+                    f"{parte} {minutos:02d}:{segundos:02d} - Desconto tempo {st.session_state.clube_adversario}"
+                )
+                if 'desconto_visit_part' not in st.session_state:
+                    st.session_state.desconto_visit_part = {}
+                st.session_state.desconto_visit_part[st.session_state.part] = True
 
     st_autorefresh(interval=1000, key="refresh")
 
