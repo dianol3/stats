@@ -235,7 +235,7 @@ if st.session_state.page == 'home':
         st.session_state.page = 1
     elif escolha == "Ver Jogos Guardados":
         st.session_state.page = 'ver_jogos'
-
+    st.stop()
 # ================
 # ver jogos
 # ===============
@@ -278,7 +278,7 @@ if st.session_state.page == 'ver_jogos':
     if st.button("⬅️ Voltar"):
         st.session_state.page = 'home'
         pass
-
+    st.stop()
 # ======================
 # Página 1 - Configuração
 # ======================
