@@ -3,6 +3,8 @@ import os
 import json
 import pandas as pd
 from datetime import datetime
+from streamlit_autorefresh import st_autorefresh
+
 
 st.set_page_config(page_title="Gestão de Jogos", layout="wide")
 
