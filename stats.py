@@ -3,6 +3,37 @@ import pandas as pd
 import time
 import os
 from streamlit_autorefresh import st_autorefresh
+import json
+
+# Caminho para os jogos
+JOGOS_DIR = "jogos"
+
+# Carregar o jogo selecionado
+if "jogo_selecionado" not in st.session_state:
+    st.warning("Nenhum jogo selecionado. Volta à página principal.")
+    st.stop()
+
+jogo_path = os.path.join(JOGOS_DIR, st.session_state.jogo_selecionado)
+if not os.path.exists(jogo_path):
+    st.error("Ficheiro de jogo não encontrado.")
+    st.stop()
+
+# Carregar dados do ficheiro
+with open(jogo_path, "r", encoding="utf-8") as f:
+    jogo_data = json.load(f)
+
+# Inicializar session_state com dados do jogo
+st.session_state.modalidade = jogo_data.get("modalidade", "Futebol")
+st.session_state.tempo_parte = jogo_data.get("tempo_parte", 45)
+st.session_state.team_name = jogo_data.get("equipa", "")
+st.session_state.clube_adversario = jogo_data.get("adversario", "")
+st.session_state.score = jogo_data.get("score", {"nossa": 0, "adversario": 0})
+st.session_state.part = jogo_data.get("part", 1)
+st.session_state.elapsed_time = jogo_data.get("elapsed_time", 0)
+st.session_state.faltas_nossa = jogo_data.get("faltas_nossa", 0)
+st.session_state.faltas_adversario = jogo_data.get("faltas_adversario", 0)
+st.session_state.event_log = jogo_data.get("event_log", [])
+
 
 
 st.set_page_config(page_title="Estatísticas Ao Vivo", layout="wide")
@@ -155,20 +186,24 @@ def add_stat(idx, stat, value=1):
     if stat == 'Golos':
         st.session_state.score['Nossa'] += value
         log_event(f"Golo - {player_name}")
+        save_game()
     elif stat == 'Faltas Cometidas':
         if st.session_state.playing_home:
             st.session_state.faltas_nossa += value
         else:
             st.session_state.faltas_adversario += value
         log_event(f"Falta Cometida - {player_name}")
+        save_game()
     elif stat == 'Faltas Sofridas':
         if st.session_state.playing_home:
             st.session_state.faltas_adversario += value
         else:
             st.session_state.faltas_nossa += value
         log_event(f"Falta Sofrida - {player_name}")
+        save_game()
     else:
         log_event(f"{stat} - {player_name}")
+        save_game()
 
 def substitute_player(idx_out, idx_in):
     st.session_state.players.at[idx_out, 'Em jogo'] = False
@@ -226,9 +261,36 @@ if st.session_state.page == 2:
             for jogador in jogadores_selecionados:
                 idx = st.session_state.players[st.session_state.players['Jogador']==jogador].index[0]
                 st.session_state.players.at[idx, 'Em jogo'] = True
+                st.session_state.titulares_1a_parte = jogadores_selecionados.copy()
+                log_event("Titulares 1ª Parte: " + ", ".join(jogadores_selecionados))
             st.session_state.page = 3  # Página do jogo
     else:
         st.warning("O número de jogadores no ficheiro é menor que o número de titulares definido.")
+
+%----------------------------
+% Save game
+%----------------------------
+def save_game():
+    """Guarda o estado atual do jogo no ficheiro JSON"""
+    jogo_data = {
+        "equipa": st.session_state.team_name,
+        "adversario": st.session_state.clube_adversario,
+        "modalidade": st.session_state.modalidade,
+        "tempo_parte": st.session_state.tempo_parte,
+        "score": st.session_state.score,
+        "part": st.session_state.part,
+        "elapsed_time": st.session_state.elapsed_time,
+        "faltas_nossa": st.session_state.faltas_nossa,
+        "faltas_adversario": st.session_state.faltas_adversario,
+        "event_log": st.session_state.event_log,
+        "estado": "em_andamento",
+        "data_criacao": jogo_data.get("data_criacao", "agora")
+    }
+    if "players" in st.session_state and not st.session_state.players.empty:
+        jogo_data["players"] = st.session_state.players.to_dict()
+
+    with open(jogo_path, "w", encoding="utf-8") as f:
+        json.dump(jogo_data, f, indent=2)
 
 # ======================
 # Página 3 - Jogo
@@ -266,7 +328,7 @@ if st.session_state.page == 3:
     # ======================
     # Botão Golo do Adversário
     # ======================
-    col_adv1, col_adv2 = st.columns([1,1])
+    col_adv1, col_adv2, col_adv3 = st.columns([1,1])
     with col_adv1:
         if st.button("-1 Golo adv", key="golo_adversario_minus"):
             st.session_state.score['Adversário'] -= 1
@@ -277,6 +339,11 @@ if st.session_state.page == 3:
         if st.button("+1 Golo adv", key="golo_adversario_plus"):
             st.session_state.score['Adversário'] += 1
             log_event("Golo Adversário")
+            save_game()
+    with col_adv3:
+        if st.button("⬅️ Voltar à Gestão de Jogos"):
+            save_game()
+            st.switch_page("main.py")
 
     # Botões de controle
     col1, col2 = st.columns(2)
@@ -303,6 +370,11 @@ if st.session_state.page == 3:
             st.session_state.elapsed_time = 0
             st.session_state.faltas_nossa = 0
             st.session_state.faltas_adversario = 0
+            # Guardar titulares da 2ª parte
+            titulares_2a_parte = st.session_state.players[st.session_state.players['Em jogo'] == True]['Jogador'].tolist()
+            st.session_state.titulares_2a_parte = titulares_2a_parte
+            log_event("Titulares 2ª Parte: " + ", ".join(titulares_2a_parte))
+
 
     if st.session_state.part == 2 and st.session_state.elapsed_time >= st.session_state.tempo_parte*60:
         if st.button("Final do jogo"):
@@ -350,6 +422,7 @@ if st.session_state.page == 3:
             idx_in = st.session_state.players[st.session_state.players['Jogador']==in_player].index[0]
             substitute_player(idx_out, idx_in)
             log_event(f"Substituição - Entra {in_player}, Sai {out_player}")  # regista evento
+            save_game()
 
     # ======================
     # Tabela de jogadores
@@ -383,6 +456,7 @@ if st.session_state.page == 3:
         file_name="bloco_de_notas_jogo.txt",
         mime="text/plain"
     )
+
 
 
 
