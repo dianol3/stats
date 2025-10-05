@@ -51,8 +51,6 @@ if 'faltas_nossa' not in st.session_state:
     st.session_state.faltas_nossa = 0
 if 'faltas_adversario' not in st.session_state:
     st.session_state.faltas_adversario = 0
-if 'page' not in st.session_state:
-    st.session_state.page = 1
 if 'event_log' not in st.session_state:
     st.session_state.event_log = []
 
