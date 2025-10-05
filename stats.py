@@ -395,11 +395,6 @@ if st.session_state.page == 3:
             titulares = st.session_state.players[st.session_state.players['Em jogo'] == True]
             nomes = ", ".join(titulares['Jogador'])
             log_event(f"Titulares da 2ª parte: {nomes}", value=0)
-
-    if st.session_state.part == 2 and st.session_state.elapsed_time >= st.session_state.tempo_parte*60:
-        if st.button("Final do jogo"):
-            st.session_state.game_started = False
-            st.success("⚽ Jogo terminado!")
                 
 # ======================
 # Barra lateral - Eventos
@@ -461,16 +456,9 @@ st.dataframe(st.session_state.players.style.apply(style_player, axis=1), use_con
 # Bloco de Notas - Log do Jogo
 # ======================
 st.subheader("📝 Bloco de Notas do Jogo")
-if 'event_log' in st.session_state and st.session_state.event_log:
+if st.session_state.event_log:
     for e in st.session_state.event_log:
         st.markdown(f"- {e}")
 else:
     st.write("Ainda não há eventos registados.")
-
-log_text = "\n".join(st.session_state.event_log)
-st.download_button(
-    label="📥 Download Bloco de Notas",
-    data=log_text,
-    file_name="bloco_de_notas_jogo.txt",
-    mime="text/plain"
 )
