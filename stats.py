@@ -380,14 +380,11 @@ if st.session_state.page == 3:
 
             from github import Github
 
-            # ✅ Primeiro pega o token em uma variável
+            # Token
             github_token = st.secrets["GITHUB_TOKEN"]
-            
-            # Depois cria o objeto Github
             g = Github(github_token)
-
             
-            # Repositório no formato "usuario/repositorio"
+            # Repositório
             repo = g.get_repo("dianol3/stats")
             
             # Nome do ficheiro
@@ -397,22 +394,26 @@ if st.session_state.page == 3:
             log_text = "\n".join(st.session_state.event_log)
             players_csv = st.session_state.players.to_csv(index=False, encoding="utf-8-sig")
             
+            # Pasta no repositório
+            folder_path = f"{st.session_state.team_name}"
+            
+            # Função auxiliar para criar ou atualizar arquivo
+            def create_or_update_file(repo, path, message, content):
+                try:
+                    repo.create_file(path, message, content)
+                except Exception as e:
+                    # Se já existir, atualizar
+                    try:
+                        contents = repo.get_contents(path)
+                        repo.update_file(contents.path, message, content, contents.sha)
+                    except Exception as ee:
+                        st.error(f"Erro ao criar/atualizar {path}: {ee}")
+            
             # --- Guardar logbook ---
-            try:
-                repo.create_file(f"{st.session_state.team_name}/{base_filename}_logbook.txt",
-                                 f"Add logbook {base_filename}", log_text)
-            except:
-                # Se já existir, atualizar
-                contents = repo.get_contents(f"{st.session_state.team_name}/{base_filename}_logbook.txt")
-                repo.update_file(contents.path, f"Update logbook {base_filename}", log_text, contents.sha)
+            create_or_update_file(repo, f"{folder_path}/{base_filename}_logbook.txt", f"Add logbook {base_filename}", log_text)
             
             # --- Guardar tabela de jogadores ---
-            try:
-                repo.create_file(f"{st.session_state.team_name}/{base_filename}_players.csv",
-                                 f"Add players table {base_filename}", players_csv)
-            except:
-                contents = repo.get_contents(f"{st.session_state.team_name}/{base_filename}_players.csv")
-                repo.update_file(contents.path, f"Update players table {base_filename}", players_csv, contents.sha)
+            create_or_update_file(repo, f"{folder_path}/{base_filename}_players.csv", f"Add players table {base_filename}", players_csv)
             
             st.success("✅ Resultados guardados no GitHub!")
 
