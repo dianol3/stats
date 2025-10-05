@@ -299,7 +299,11 @@ if st.session_state.page == 1:
         st.session_state.team_name = team_name
         load_players(team_name)
         st.session_state.page = 2
-        
+
+        # Botão para voltar à página inicial
+        if st.button("⬅️ Voltar"):
+            st.session_state.page = 'home'
+            pass
     st.stop()
 # ======================
 # Página 2 - Seleção dos Titulares
