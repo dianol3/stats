@@ -279,6 +279,7 @@ if st.session_state.page == 'ver_jogos':
 if st.button("⬅️ Voltar", key="voltar_home1"):
     st.session_state.page = 'home'
     st.stop()
+st.stop()
 # ======================
 # Página 1 - Configuração
 # ======================
