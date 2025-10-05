@@ -61,7 +61,12 @@ if st.button("✅ Iniciar novo jogo"):
 # ======================
 st.subheader("📋 Jogos existentes")
 
-files = sorted(os.listdir(JOGOS_DIR), reverse=True)
+# Atualiza a página a cada 2 segundos (2000 ms)
+st_autorefresh(interval=2000, key="refresh_jogos")
+
+# Lista apenas ficheiros .json
+files = sorted([f for f in os.listdir(JOGOS_DIR) if f.endswith(".json")], reverse=True)
+
 if not files:
     st.info("Ainda não há jogos registados.")
 else:
@@ -90,8 +95,8 @@ else:
         with col4:
             if st.button("▶️ Continuar", key=f"cont_{j['Ficheiro']}"):
                 st.session_state.jogo_selecionado = j["Ficheiro"]
-                st.switch_page("stats.py")
+                st.switch_page("stats")  # Nome da página multi-page sem .py
         with col5:
             if st.button("🗑️", key=f"del_{j['Ficheiro']}"):
                 os.remove(os.path.join(JOGOS_DIR, j["Ficheiro"]))
-                st.experimental_rerun()
+                # A página vai atualizar automaticamente graças ao st_autorefresh
