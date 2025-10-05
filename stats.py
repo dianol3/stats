@@ -7,6 +7,18 @@ from streamlit_autorefresh import st_autorefresh
 st.set_page_config(page_title="Estatísticas Ao Vivo", layout="wide")
 
 # ======================
+# CSS para desativar pull-to-refresh em dispositivos móveis
+# ======================
+st.markdown("""
+    <style>
+    html, body {
+        overscroll-behavior-y: contain;
+        touch-action: pan-x pan-y;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
+# ======================
 # Estado da Sessão
 # ======================
 if 'players' not in st.session_state:
