@@ -311,16 +311,50 @@ if st.session_state.page == 3:
             st.session_state.score['Adversário'] += 1
             log_event("Golo Adversário")
 
-    # Controlo do jogo
-    col1, col2 = st.columns(2)
+    # Controlo do jogo + Descontos de tempo
+    col1, col2, col3, col4 = st.columns(4)
+    
+    # ▶️ Iniciar / Retomar
     with col1:
         if st.button("▶️ Iniciar / Retomar"):
-            st.session_state.game_started = True
-            if st.session_state.start_time is None:
+            if not st.session_state.game_started:
+                st.session_state.game_started = True
                 st.session_state.start_time = time.time() - st.session_state.elapsed_time
+    
+    # ⏸️ Pausar
     with col2:
         if st.button("⏸️ Pausar"):
-            st.session_state.game_started = False
+            if st.session_state.game_started:
+                current_elapsed = time.time() - st.session_state.start_time
+                st.session_state.elapsed_time = current_elapsed
+                st.session_state.game_started = False
+                st.session_state.start_time = None
+    
+    # Desconto tempo – Equipa da casa
+    with col3:
+        if 'desconto_casa_usado' not in st.session_state:
+            st.session_state.desconto_casa_usado = False
+        if st.session_state.part not in st.session_state.get('desconto_casa_part', {}):
+            if st.button(f"⏱️ Desconto {team_names_map.get(st.session_state.team_name, st.session_state.team_name)}"):
+                st.session_state.elapsed_time -= 60  # 1 minuto de desconto
+                st.session_state.desconto_casa_usado = True
+                st.session_state.event_log.append(f"{'1ª' if st.session_state.part==1 else '2ª'} Parte 00:00 - Desconto tempo {team_names_map.get(st.session_state.team_name)}")
+                if 'desconto_casa_part' not in st.session_state:
+                    st.session_state.desconto_casa_part = {}
+                st.session_state.desconto_casa_part[st.session_state.part] = True
+    
+    # Desconto tempo – Equipa visitante
+    with col4:
+        if 'desconto_visitante_usado' not in st.session_state:
+            st.session_state.desconto_visitante_usado = False
+        if st.session_state.part not in st.session_state.get('desconto_visitante_part', {}):
+            if st.button(f"⏱️ Desconto {st.session_state.clube_adversario}"):
+                st.session_state.elapsed_time -= 60  # 1 minuto de desconto
+                st.session_state.desconto_visitante_usado = True
+                st.session_state.event_log.append(f"{'1ª' if st.session_state.part==1 else '2ª'} Parte 00:00 - Desconto tempo {st.session_state.clube_adversario}")
+                if 'desconto_visitante_part' not in st.session_state:
+                    st.session_state.desconto_visitante_part = {}
+                st.session_state.desconto_visitante_part[st.session_state.part] = True
 
     st_autorefresh(interval=1000, key="refresh")
 
