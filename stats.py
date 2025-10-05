@@ -280,23 +280,6 @@ if st.session_state.page == 3:
         st.session_state.desconto_nossa = {1: False, 2: False}
     if 'desconto_adversario' not in st.session_state:
         st.session_state.desconto_adversario = {1: False, 2: False}
-    
-    # Botões na sidebar
-    st.sidebar.subheader("Desconto de Tempo")
-    
-    col1, col2 = st.sidebar.columns(2)
-    
-    with col1:
-        if not st.session_state.desconto_nossa[parte_atual]:
-            if st.button(f"Desconto {st.session_state.team_name}"):
-                st.session_state.desconto_nossa[parte_atual] = True
-                log_event(f"Desconto de tempo - {st.session_state.team_name}")
-    
-    with col2:
-        if not st.session_state.desconto_adversario[parte_atual]:
-            if st.button(f"Desconto {st.session_state.clube_adversario}"):
-                st.session_state.desconto_adversario[parte_atual] = True
-                log_event(f"Desconto de tempo - {st.session_state.clube_adversario}")
 
     # Botões Golo do Adversário
     col_adv1, col_adv2 = st.columns([1, 1])
