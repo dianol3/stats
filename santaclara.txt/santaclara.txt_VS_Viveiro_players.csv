@@ -1,9 +1,9 @@
 Número,Jogador,Em jogo,Golos,Assistências,Perdas de Bola,Recuperações,Amarelos,Vermelhos,Remates à Baliza,Remates Fora,Faltas Cometidas,Faltas Sofridas,Defesas,Tempo de Jogo
-1,Luiz,True,0,0,0,1,0,0,0,1,0,0,0,0.10529764095942179
-4,Kiko,True,0,0,0,0,0,0,0,0,0,0,0,0.10529764095942179
-5,Gui,True,0,0,0,0,0,0,0,0,0,0,0,0.10529764095942179
-6,Diego,True,0,0,0,0,0,0,0,0,0,0,0,0.10529764095942179
-8,Ritinha,True,0,0,0,0,0,0,0,0,0,0,0,0.10529764095942179
+1,Luiz,True,0,0,1,2,0,0,0,1,0,0,1,0.15349738597869872
+4,Kiko,True,0,0,0,0,0,0,0,0,0,0,0,0.15349738597869872
+5,Gui,True,0,0,0,0,0,0,0,0,0,0,0,0.15349738597869872
+6,Diego,True,0,0,0,0,0,0,0,0,0,0,0,0.15349738597869872
+8,Ritinha,True,0,0,0,0,0,0,0,0,0,0,0,0.15349738597869872
 10,Enzo,False,0,0,0,0,0,0,0,0,0,0,0,0.0
 11,Sandro,False,0,0,0,0,0,0,0,0,0,0,0,0.0
 14,António,False,0,0,0,0,0,0,0,0,0,0,0,0.0
