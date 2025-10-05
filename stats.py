@@ -224,7 +224,7 @@ if st.session_state.page == 2:
                 st.session_state.players.at[idx, 'Em jogo'] = True
                 titulares = st.session_state.players[st.session_state.players['Em jogo'] == True]
                 nomes = ", ".join(titulares['Jogador'])
-                log_event(f"Titulares da 1ª parte: {nomes}", value=0)
+            log_event(f"Titulares da 1ª parte: {nomes}", value=0)
             st.session_state.page = 3
     else:
         st.warning("O número de jogadores no ficheiro é menor que o número de titulares definido.")
