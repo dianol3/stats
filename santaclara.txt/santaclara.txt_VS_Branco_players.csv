@@ -1,14 +1,14 @@
 Número,Jogador,Em jogo,Golos,Assistências,Perdas de Bola,Recuperações,Amarelos,Vermelhos,Remates à Baliza,Remates Fora,Faltas Cometidas,Faltas Sofridas,Defesas,Tempo de Jogo
-1,Luiz,True,0,0,1,0,0,0,1,0,0,0,0,0.7523741165796919
+1,Luiz,False,0,0,1,0,0,0,1,0,0,0,0,0.8434152762095136
 4,Kiko,False,3,0,0,1,0,0,0,1,1,1,1,1.568226158618927
-5,Gui,True,1,0,0,0,0,0,1,0,1,1,0,1.568226158618927
-6,Diego,True,0,0,0,0,0,0,0,0,0,0,0,1.568226158618927
-8,Ritinha,True,0,0,0,0,0,0,0,0,0,0,0,1.568226158618927
-10,Enzo,True,0,0,0,0,0,0,0,0,0,0,0,0.8158520420392354
+5,Gui,True,1,0,0,0,0,0,1,0,1,1,0,1.659267318248749
+6,Diego,True,0,0,0,0,0,0,0,0,0,0,0,1.659267318248749
+8,Ritinha,True,0,0,0,0,0,0,0,0,0,0,0,1.659267318248749
+10,Enzo,True,0,0,0,0,0,0,0,0,0,0,0,0.9068932016690572
 11,Sandro,False,0,0,0,0,0,0,0,0,0,0,0,0.0
 14,António,False,0,0,0,0,0,0,0,0,0,0,0,0.0
 15,Dinis,False,0,0,0,0,0,0,0,0,0,0,0,0.0
 16,Diogo,False,0,0,0,0,0,0,0,0,0,0,0,0.0
-17,Francisco,False,0,0,0,0,0,0,0,0,0,0,0,0.0
+17,Francisco,True,0,0,0,0,0,0,0,0,0,0,0,0.0
 18,Matilde,False,0,0,0,0,0,0,0,0,0,0,0,0.0
 31,Miguel,False,0,0,0,0,0,0,0,0,0,0,0,0.0
