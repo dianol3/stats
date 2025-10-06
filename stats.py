@@ -128,7 +128,6 @@ def remove_last_event(evento, jogador=None):
             if evento in entry:
                 st.session_state.event_log.pop(i)
                 break
-
 def log_event(descricao, value=1):
     minutos = int(st.session_state.elapsed_time // 60)
     segundos = int(st.session_state.elapsed_time % 60)
@@ -145,12 +144,7 @@ def log_event(descricao, value=1):
     # Adicionar evento
     st.session_state.event_log.append(f"{parte} {minutos:02d}:{segundos:02d} - {descricao}")
 
-    # --- Atualizar GitHub ---
-    log_text = "\n".join(st.session_state.event_log)
-    players_csv = st.session_state.players.to_csv(index=False, encoding="utf-8-sig")
-
-    create_or_update_file(repo, f"{folder_path}/{base_filename}_logbook.txt", f"Update logbook {base_filename}", log_text)
-    create_or_update_file(repo, f"{folder_path}/{base_filename}_players.csv", f"Update players table {base_filename}", players_csv)
+    # OBS: Não atualizamos mais o GitHub aqui!
 
 
 def add_stat(idx, stat, value=1):
@@ -346,10 +340,10 @@ if st.session_state.page == 2:
     st.stop()
 
 # ======================
-# Página 3 - Jogo otimizado
+# Página 3 - Jogo otimizado com GitHub a cada 30s
 # ======================
 if st.session_state.page == 3:
-    # Título
+    # Título do jogo
     if st.session_state.playing_home:
         st.title(f"{team_names_map.get(st.session_state.team_name, st.session_state.team_name)} vs {st.session_state.clube_adversario}")
     else:
@@ -383,12 +377,13 @@ if st.session_state.page == 3:
     else:
         placar_text = f"{st.session_state.clube_adversario} {st.session_state.score['Adversário']} - {team_names_map.get(st.session_state.team_name)} {st.session_state.score['Nossa']}"
         faltas_text = f"Faltas: {st.session_state.faltas_adversario} / {st.session_state.faltas_nossa}"
+
     st.markdown(f"### {placar_text}")
     st.markdown(f"#### {faltas_text}")
 
-    # ----------------------------------
-    # Controlo do Jogo e Descontos
-    # ----------------------------------
+    # -------------------------
+    # Controlo do jogo e descontos
+    # -------------------------
     col1, col2, col3, col4 = st.columns(4)
     with col1:
         if st.button("▶️ Iniciar / Retomar"):
@@ -420,10 +415,10 @@ if st.session_state.page == 3:
                     st.session_state.desconto_visit_part = {}
                 st.session_state.desconto_visit_part[st.session_state.part] = True
 
-    # ----------------------------------
-    # Botões de Golo Adversário
-    # ----------------------------------
-    col_adv1, col_adv2 = st.columns([1, 1])
+    # -------------------------
+    # Golo Adversário
+    # -------------------------
+    col_adv1, col_adv2 = st.columns([1,1])
     with col_adv1:
         if st.button("-1 Golo adv"):
             st.session_state.score['Adversário'] = max(0, st.session_state.score['Adversário'] - 1)
@@ -433,10 +428,10 @@ if st.session_state.page == 3:
             st.session_state.score['Adversário'] += 1
             log_event("Golo Adversário")
 
-    # ----------------------------------
-    # Início 2ª parte / Final do Jogo
-    # ----------------------------------
-    if st.session_state.elapsed_time >= st.session_state.tempo_parte*60 and st.session_state.part == 1:
+    # -------------------------
+    # Início 2ª parte / Final do jogo
+    # -------------------------
+    if st.session_state.part == 1 and st.session_state.elapsed_time >= st.session_state.tempo_parte*60:
         st.warning("⏸️ Intervalo - 1ª Parte terminada")
         if st.button("Início 2ª Parte"):
             st.session_state.part = 2
@@ -444,16 +439,32 @@ if st.session_state.page == 3:
             st.session_state.elapsed_time = 0
             st.session_state.faltas_nossa = 0
             st.session_state.faltas_adversario = 0
-            titulares = st.session_state.players[st.session_state.players['Em jogo'] == True]
+            titulares = st.session_state.players[st.session_state.players['Em jogo']==True]
             nomes = ", ".join(titulares['Jogador'])
             log_event(f"Titulares da 2ª parte: {nomes}", value=0)
 
-    # ----------------------------------
+    if st.session_state.part == 2 and st.session_state.elapsed_time >= st.session_state.tempo_parte*60:
+        st.warning("⏹️ Fim do Jogo - 2ª Parte terminada")
+        if st.button("Finalizar Jogo"):
+            log_text = "\n".join(st.session_state.event_log)
+            players_csv = st.session_state.players.to_csv(index=False, encoding="utf-8-sig")
+            try:
+                create_or_update_file(repo, f"{folder_path}/{base_filename}_logbook.txt", f"Final logbook {base_filename}", log_text)
+                create_or_update_file(repo, f"{folder_path}/{base_filename}_players.csv", f"Final players table {base_filename}", players_csv)
+                st.success("Jogo finalizado e dados gravados no GitHub ✅")
+            except Exception as e:
+                st.error(f"Erro ao gravar no GitHub: {e}")
+            st.session_state.game_started = False
+            st.session_state.start_time = None
+            st.session_state.part = 1
+            st.stop()
+
+    # -------------------------
     # Substituições
-    # ----------------------------------
+    # -------------------------
     st.subheader("🔄 Substituições")
-    em_jogo = st.session_state.players[st.session_state.players['Em jogo'] == True]
-    banco = st.session_state.players[st.session_state.players['Em jogo'] == False]
+    em_jogo = st.session_state.players[st.session_state.players['Em jogo']==True]
+    banco = st.session_state.players[st.session_state.players['Em jogo']==False]
 
     if not em_jogo.empty and not banco.empty:
         out_player = st.selectbox("Jogador a sair (Em jogo):", em_jogo['Jogador'], key='out_player')
@@ -464,9 +475,9 @@ if st.session_state.page == 3:
             substitute_player(idx_out, idx_in)
             log_event(f"Substituição - Entra {in_player}, Sai {out_player}")
 
-    # ----------------------------------
-    # Tabela de Jogadores
-    # ----------------------------------
+    # -------------------------
+    # Tabela de jogadores
+    # -------------------------
     def style_player(row):
         if row['Vermelhos'] > 0:
             cor = 'background-color: red'
@@ -478,9 +489,9 @@ if st.session_state.page == 3:
 
     st.dataframe(st.session_state.players.style.apply(style_player, axis=1), use_container_width=True)
 
-    # ----------------------------------
+    # -------------------------
     # Bloco de Notas - Log do Jogo
-    # ----------------------------------
+    # -------------------------
     st.subheader("📝 Bloco de Notas do Jogo")
     if st.session_state.event_log:
         for e in st.session_state.event_log:
@@ -488,11 +499,24 @@ if st.session_state.page == 3:
     else:
         st.write("Ainda não há eventos registados.")
 
-    # ----------------------------------
-    # Auto-refresh do cronômetro
-    # ----------------------------------
+    # -------------------------
+    # Auto-refresh + GitHub a cada 30s
+    # -------------------------
     st_autorefresh(interval=1000, key="refresh")
-                
+
+    if 'last_github_update' not in st.session_state:
+        st.session_state.last_github_update = time.time()
+
+    if time.time() - st.session_state.last_github_update > 30:
+        log_text = "\n".join(st.session_state.event_log)
+        players_csv = st.session_state.players.to_csv(index=False, encoding="utf-8-sig")
+        try:
+            create_or_update_file(repo, f"{folder_path}/{base_filename}_logbook.txt", f"Update logbook {base_filename}", log_text)
+            create_or_update_file(repo, f"{folder_path}/{base_filename}_players.csv", f"Update players table {base_filename}", players_csv)
+        except Exception as e:
+            st.warning(f"Erro ao atualizar GitHub: {e}")
+        st.session_state.last_github_update = time.time()
+
 # ======================
 # Barra lateral - Eventos
 # ======================
