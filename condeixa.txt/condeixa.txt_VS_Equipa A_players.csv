@@ -1,10 +1,10 @@
 Número,Jogador,Em jogo,Golos,Assistências,Perdas de Bola,Recuperações,Amarelos,Vermelhos,Remates à Baliza,Remates Fora,Faltas Cometidas,Faltas Sofridas,Defesas,Tempo de Jogo
 1,Ariana,False,0,0,0,2,0,0,0,1,1,1,2,0.5574263334274292
-2,Bia,True,0,0,0,0,0,0,0,0,0,0,0,0.6228235522905985
-3,Carolina,True,0,0,0,0,0,0,0,0,0,0,0,0.6228235522905985
-4,Kika,True,0,0,0,0,0,0,0,0,0,0,0,0.6228235522905985
-5,Sara,True,0,0,0,0,0,0,0,0,0,0,0,0.6228235522905985
-6,Carol,True,0,0,0,0,0,0,0,0,0,0,0,0.06539721886316935
+2,Bia,True,1,0,0,0,0,0,0,0,0,0,0,0.685279107093811
+3,Carolina,True,0,0,0,0,0,0,0,0,0,0,0,0.685279107093811
+4,Kika,True,0,0,0,0,0,0,0,0,0,0,0,0.685279107093811
+5,Sara,True,0,0,0,0,0,0,0,0,0,0,0,0.685279107093811
+6,Carol,True,0,0,0,0,0,0,0,0,0,0,0,0.12785277366638184
 7,Diana,False,0,0,0,0,0,0,0,0,0,0,0,0.0
 8,Laura,False,0,0,0,0,0,0,0,0,0,0,0,0.0
 9,Laurinha,False,0,0,0,0,0,0,0,0,0,0,0,0.0
