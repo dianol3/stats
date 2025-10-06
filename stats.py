@@ -448,6 +448,10 @@ if st.session_state.page == 3:
             log_event(f"Titulares da 2ª parte: {nomes}", value=0)
 
     if st.session_state.part == 2 and st.session_state.elapsed_time >= st.session_state.tempo_parte*60:
+        st.write("DEBUG → parte:", st.session_state.part)
+        st.write("DEBUG → elapsed_time:", st.session_state.elapsed_time)
+        st.write("DEBUG → limite:", st.session_state.tempo_parte*60)
+
         st.warning("⏹️ Fim do Jogo - 2ª Parte terminada")
         if st.button("Finalizar Jogo"):
             log_text = "\n".join(st.session_state.event_log)
