@@ -1,10 +1,10 @@
 Número,Jogador,Em jogo,Golos,Assistências,Perdas de Bola,Recuperações,Amarelos,Vermelhos,Remates à Baliza,Remates Fora,Faltas Cometidas,Faltas Sofridas,Defesas,Tempo de Jogo
 1,Luiz,False,0,0,1,0,0,0,1,0,0,0,0,0.7523741165796919
-4,Kiko,True,1,0,0,1,0,0,0,1,1,1,1,1.4376375754674278
-5,Gui,True,1,0,0,0,0,0,1,0,1,1,0,1.4376375754674278
-6,Diego,True,0,0,0,0,0,0,0,0,0,0,0,1.4376375754674278
-8,Ritinha,True,0,0,0,0,0,0,0,0,0,0,0,1.4376375754674278
-10,Enzo,True,0,0,0,0,0,0,0,0,0,0,0,0.6852634588877361
+4,Kiko,True,2,0,0,1,0,0,0,1,1,1,1,1.474012053012848
+5,Gui,True,1,0,0,0,0,0,1,0,1,1,0,1.474012053012848
+6,Diego,True,0,0,0,0,0,0,0,0,0,0,0,1.474012053012848
+8,Ritinha,True,0,0,0,0,0,0,0,0,0,0,0,1.474012053012848
+10,Enzo,True,0,0,0,0,0,0,0,0,0,0,0,0.7216379364331564
 11,Sandro,False,0,0,0,0,0,0,0,0,0,0,0,0.0
 14,António,False,0,0,0,0,0,0,0,0,0,0,0,0.0
 15,Dinis,False,0,0,0,0,0,0,0,0,0,0,0,0.0
