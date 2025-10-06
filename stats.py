@@ -343,6 +343,7 @@ if st.session_state.page == 2:
 # Página 3 - Jogo otimizado com GitHub a cada 30s
 # ======================
 if st.session_state.page == 3:
+    
     # Título do jogo
     if st.session_state.playing_home:
         st.title(f"{team_names_map.get(st.session_state.team_name, st.session_state.team_name)} vs {st.session_state.clube_adversario}")
@@ -350,7 +351,7 @@ if st.session_state.page == 3:
         st.title(f"{st.session_state.clube_adversario} vs {team_names_map.get(st.session_state.team_name, st.session_state.team_name)}")
 
     # Atualizar tempo
-    if st.session_state.game_started and st.session_state.start_time is not None:
+    if st.session_state.start_time is not None:
         st.session_state.elapsed_time = time.time() - st.session_state.start_time
 
     # Cronômetro
@@ -431,6 +432,9 @@ if st.session_state.page == 3:
     # -------------------------
     # Início 2ª parte / Final do jogo
     # -------------------------
+    # Atualiza o tempo decorrido sempre que start_time existe
+    if st.session_state.start_time is not None:
+        st.session_state.elapsed_time = time.time() - st.session_state.start_time
     if st.session_state.part == 1 and st.session_state.elapsed_time >= st.session_state.tempo_parte*60:
         st.warning("⏸️ Intervalo - 1ª Parte terminada")
         if st.button("Início 2ª Parte"):
