@@ -435,7 +435,7 @@ if st.session_state.page == 3:
         st.warning("⏸️ Intervalo - 1ª Parte terminada")
         if st.button("Início 2ª Parte"):
             st.session_state.part = 2
-            st.session_state.start_time = None
+            st.session_state.start_time = time.time()  # começar agora
             st.session_state.elapsed_time = 0
             st.session_state.faltas_nossa = 0
             st.session_state.faltas_adversario = 0
